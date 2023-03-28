@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "859435119197",
+    "project_id": "valmob-13ddf",
+    "storage_bucket": "valmob-13ddf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859435119197:android:48fb856a344cf339b053b4",
+        "android_client_info": {
+          "package_name": "com.valmob.valmob"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859435119197-95auqrl6ofn6e5jusadmio6vlof0e8ou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCSy543RAmy8VX5Pbwwcr2vgzxQp4pdwo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859435119197-95auqrl6ofn6e5jusadmio6vlof0e8ou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
