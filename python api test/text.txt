@@ -1,22 +1,15 @@
-{
-startTime: 2023-03-22T22:00:00Z,
-state: completed,
-type: match,
-blockName: Round 1,
-league: {
-    name: Game Changers LATAM,
-    slug: game_changers_latam,
-    image: http://static.lolesports.com/leagues/1676629257516_604be13d01964.png,
-    region: LATIN AMERICA
-    },
-tournament: {split: {name: game_changers_latam}, season: {name: 2023}},
-match: {
-    id: 109879965968409521,
-    flags: [],
-    teams: [
-        {name: Sunxet Club, code: SNX, image: http://static.lolesports.com/teams/1651527903521_SunXet.png, result: {outcome: null, gameWins: 1}, record: {wins: 1, losses: 0}},
-        {name: Movistar Optix, code: MOX, image: http://static.lolesports.com/teams/1676633766731_LOGOCOMPLETOCOLORFONDOOSCURO2x1.png, result: {outcome: null, gameWins: 0}, record: {wins: 0, losses: 1}}
-        ],
-    strategy: {type: bestOf, count: 3}
-    }
-}
+https://vlrgg.cyclic.app/api/matches/upcoming:
+team_one_name
+team_two_name
+match_url
+event_name
+event_icon_url
+match_time
+eta
+
+https://vlrggapi.vercel.app/match/upcoming
+flag1
+flag2
+score1
+score2
+round_info
