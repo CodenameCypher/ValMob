@@ -1,30 +1,37 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:valmob/models/matches.dart';
+import 'package:valmob/models/matches.dart' as model;
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 
 class Matches{
   final CollectionReference ref = FirebaseFirestore.instance.collection('Matches');
-  Future<List<Match>> fetchAPI() async{
+  Future<List<model.Match>> fetchAPI() async{
     print("Fetching Matches API...");
-    List<Match> matchList = [];
-    var url1 = Uri.parse("https://vlrgg.cyclic.app/api/matches/upcoming");
-    var url2 = Uri.parse("https://vlrggapi.vercel.app/match/upcoming");
-    var response1 = await http.get(url1);
-    var response2 = await http.get(url2);
-    var json1 = jsonDecode(response1.body);
-    var json2 = jsonDecode(response2.body);
-    for(var i = 0; i< json1['matches'].length ; i++){
+    List<model.Match> matchList = [];
+    var url = Uri.parse("https://vlrggapi.vercel.app/match/upcoming");
+    var headers = {
+      "cache-control": "no-cache",
+      "pragma":'no_cache',
+      'sec-ch-ua': '"Microsoft Edge";v="111", "Not(A:Brand";v="8", "Chromium";v="111"',
+      'sec-ch-ua-platform': "Windows",
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36 Edg/111.0.1661.62'
+    };
+    var response = await http.get(url, headers: headers);
+    print(response.headers);
+    var json2 = jsonDecode(Utf8Decoder().convert(response.bodyBytes));
+    for(var i = 0; i< json2['data']['segments'].length ; i++){
+      // print(json2['data']['segments'][i]['team1'] + " VS " + json2['data']['segments'][i]['team2'] + " - " + json2['data']['segments'][i]['time_until_match'] + " " + json2['data']['segments'][i]['score1'] + "-" + json2['data']['segments'][i]['score1']);
         matchList.add(
-            Match(
-                team_one_name: json1['matches'][i]['team_one_name'],
-                team_two_name: json1['matches'][i]['team_two_name'],
-                match_url: json1['matches'][i]['match_url'],
-                event_name: json1['matches'][i]['event_name'],
-                event_icon_url: json1['matches'][i]['event_icon_url'],
-                match_time: json1['matches'][i]['match_time'],
-                eta: json1['matches'][i]['eta'],
+            model.Match(
+                team_one_name: json2['data']['segments'][i]['team1'],
+                team_two_name: json2['data']['segments'][i]['team2'],
+                match_url: json2['data']['segments'][i]['match_page'],
+                event_name: json2['data']['segments'][i]['tournament_name'],
+                event_icon_url: json2['data']['segments'][i]['tournament_icon'],
+                match_time: json2['data']['segments'][i]['time_until_match'],
+                eta: json2['data']['segments'][i]['time_until_match'],
                 flag1: json2['data']['segments'][i]['flag1'],
                 flag2: json2['data']['segments'][i]['flag2'],
                 score1: json2['data']['segments'][i]['score1'],
@@ -38,11 +45,10 @@ class Matches{
   }
 
   void updateDatabase() async{
-    List<Match> matchList = await fetchAPI();
+    List<model.Match> matchList = await fetchAPI();
     print("Updating Matches Database...");
     for(var i = 0; i < matchList.length; i++){
-      Match current = matchList[i];
-      DateTime date = current.eta == ""? DateTime.now() : calculateDateTime(current.eta);
+      model.Match current = matchList[i];
       await ref.doc((i+1).toString()).set(
         {
           'team_one_name': current.team_one_name,
@@ -50,7 +56,7 @@ class Matches{
           'match_url': current.match_url,
           'event_name': current.event_name,
           'event_icon_url': current.event_icon_url,
-          'match_date': DateFormat("yyyy-MM-dd hh:mm a","en-us").parse(date.year.toString()+"-"+date.month.toString()+"-"+date.day.toString()+" "+current.match_time),
+          'match_time': current.eta == "Upcoming" ? calculateDateTime('59m from now') : calculateDateTime(current.match_time),
           'eta': current.eta,
           'flag1': current.flag1,
           'flag2': current.flag2,
@@ -66,7 +72,7 @@ class Matches{
   DateTime calculateDateTime(String eta){
     DateTime dateTime = DateTime.now();
     List<String> strings = eta.split(" ");
-    for(var i = 0; i < strings.length ; i++){
+    for(var i = 0; i < strings.length - 2 ; i++){
       String current = strings[i];
       if(current[current.length-1] == 'd'){
         dateTime = dateTime.add(Duration(days: int.parse(current.substring(0,current.length-1))));
@@ -77,6 +83,62 @@ class Matches{
         dateTime = dateTime.add(Duration(minutes: int.parse(current.substring(0,current.length-1))));
       }
     }
-    return dateTime;
+    dateTime = DateTime.fromMillisecondsSinceEpoch(dateTime.millisecondsSinceEpoch - (dateTime.millisecondsSinceEpoch % Duration(minutes: 5).inMilliseconds));
+    return alignDateTime(dateTime, Duration(hours: 1), true);
+  }
+
+  DateTime alignDateTime(DateTime dt, Duration alignment,[bool roundUp = false]) {
+    assert(alignment >= Duration.zero);
+    if (alignment == Duration.zero) return dt;
+    final correction = Duration(
+        days: 0,
+        hours: alignment.inDays > 0
+            ? dt.hour
+            : alignment.inHours > 0
+            ? dt.hour % alignment.inHours
+            : 0,
+        minutes: alignment.inHours > 0
+            ? dt.minute
+            : alignment.inMinutes > 0
+            ? dt.minute % alignment.inMinutes
+            : 0,
+        seconds: alignment.inMinutes > 0
+            ? dt.second
+            : alignment.inSeconds > 0
+            ? dt.second % alignment.inSeconds
+            : 0,
+        milliseconds: alignment.inSeconds > 0
+            ? dt.millisecond
+            : alignment.inMilliseconds > 0
+            ? dt.millisecond % alignment.inMilliseconds
+            : 0,
+        microseconds: alignment.inMilliseconds > 0 ? dt.microsecond : 0);
+    if (correction == Duration.zero) return dt;
+    final corrected = dt.subtract(correction);
+    final result = roundUp ? corrected.add(alignment) : corrected;
+    return result;
+  }
+
+  List<model.Match> convertToMatchObject(QuerySnapshot s){
+    return s.docs.map((e){
+      return model.Match(
+          team_one_name: e.get('team_one_name'),
+          team_two_name: e.get('team_two_name'),
+          match_url: e.get('match_url'),
+          event_name: e.get('event_name'),
+          event_icon_url: e.get('event_icon_url'),
+          match_time: e.get('match_time').toDate().toString(),
+          eta: e.get('eta'),
+          flag1: e.get('flag1'),
+          flag2: e.get('flag2'),
+          score1: e.get('score1'),
+          score2: e.get('score2'),
+          round_info: e.get('round_info')
+      );
+    }).toList();
+  }
+
+  Stream<List<model.Match>> get getMatch{
+    return ref.orderBy('match_time',descending: false).snapshots().map(convertToMatchObject);
   }
 }

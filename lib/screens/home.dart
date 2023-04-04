@@ -1,13 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:valmob/screens/matchView.dart';
+import 'package:valmob/screens/news/newsView.dart';
+import 'package:valmob/screens/upcomingSchedule/upcomingScheduleView.dart';
 import 'package:valmob/services/matches.dart';
+import 'package:valmob/services/news.dart';
 import 'package:valmob/services/players.dart';
-import 'package:valmob/services/schedule.dart';
 import 'package:valmob/services/teams.dart';
-import 'package:valmob/shared/loading.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:valmob/test/test.dart';
+import 'package:valmob/shared/theme.dart' as shared;
 
 class homescreen extends StatefulWidget {
   const homescreen({Key? key}) : super(key: key);
@@ -17,34 +17,78 @@ class homescreen extends StatefulWidget {
 }
 
 class _homescreenState extends State<homescreen> {
+  int _bottomNavIndex = 0;
+  List<Widget> widgetList = [
+    NewsView(),
+    UpcomingScheduleView(),
+    Text(
+      'Teams',
+      style: TextStyle(
+          color: Colors.white,
+          fontSize: 60
+      ),
+    ),
+    Text(
+      'Dev Diaries',
+      style: TextStyle(
+          color: Colors.white,
+          fontSize: 60
+      ),
+    )
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2A2A2A),
+      backgroundColor: shared.Theme.swatch1,
       appBar: AppBar(
-        toolbarHeight: 50,
-        centerTitle: true,
-        title: Padding(
-          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-          child: Text(
-                "vAlMOB",
-                style: TextStyle(
-                    fontFamily: 'ValFont',
-                  fontSize: 25,
-                ),
-              ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20)
+          )
         ),
-        backgroundColor: Color(0xFF7C0000),
+        centerTitle: true,
+        title: Text(
+          "vAlMOB", 
+          style: TextStyle(
+            fontFamily: 'ValFont',
+            fontSize: 25,
+          ),
+        ),
+        backgroundColor: shared.Theme.swatch2,
         elevation: 0,
       ),
-      body: Text("Nothing"),
+      body: widgetList[_bottomNavIndex],
       floatingActionButton: FloatingActionButton(
+        backgroundColor: shared.Theme.swatch6,
         child: Icon(Icons.refresh),
         onPressed: (){
-          Matches().updateDatabase();
-          Teams().updateDatabase();
-          Players().updateDatabase();
+          print('action button pressed');
+          print(_bottomNavIndex);
+          if(_bottomNavIndex == 0) {
+            News().updateDatabase();
+          }
+          else if(_bottomNavIndex == 1) {
+            Matches().updateDatabase();
+          }
+          else if(_bottomNavIndex == 2) {
+            Test().test();
+          }
+          // Test().test();
         },
+
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: AnimatedBottomNavigationBar(
+        icons: [Icons.newspaper_rounded ,Icons.calendar_month, Icons.groups_sharp,Icons.construction],
+        activeIndex: _bottomNavIndex,
+        gapLocation: GapLocation.end,
+        notchSmoothness: NotchSmoothness.softEdge,
+        onTap: (index) => setState(() => _bottomNavIndex = index),
+        backgroundColor: shared.Theme.swatch2,
+        inactiveColor: Colors.grey,
+        activeColor: Colors.white,
+        splashRadius: 16,
+        splashColor: shared.Theme.swatch6,
       ),
     );
   }

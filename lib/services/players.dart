@@ -9,7 +9,7 @@ class Players{
     print("Fetching Players API...");
     final url = Uri.parse("https://vlrgg.cyclic.app/api/players");
     var response = await http.get(url);
-    var json = jsonDecode(response.body);
+    var json = jsonDecode(Utf8Decoder().convert(response.bodyBytes));
     List<Player> playerList = [];
     for(var i=0; i < json['players'].length ; i++){
       var current = json['players'][i];

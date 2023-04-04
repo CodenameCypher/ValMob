@@ -12,7 +12,7 @@ class Teams{
     for(var i = 0; i < regions.length; i++){
       var url = Uri.parse('https://vlrggapi.vercel.app/rankings/'+regions[i]);
       var response = await http.get(url);
-      var json = jsonDecode(response.body);
+      var json = jsonDecode(Utf8Decoder().convert(response.bodyBytes));
       for(var j = 0; j < json['data'].length; j++){
         var current = json['data'][j];
         teamList.add(
@@ -53,5 +53,35 @@ class Teams{
       });
     }
     print('Updated Teams Database.');
+  }
+
+  Future<List<Team>> getTeam(String teamName1, String teamName2) async{
+    DocumentSnapshot doc1 =  await this.ref.doc(teamName1).get();
+    DocumentSnapshot doc2 =  await this.ref.doc(teamName2).get();
+    Team team1 = Team(
+        region: doc1.get('region'),
+        rank: doc1.get('rank'),
+        team: doc1.get('team'),
+        country: doc1.get('country'),
+        last_played: doc1.get('last_played'),
+        last_played_team: doc1.get('last_played_team'),
+        last_played_team_logo: doc1.get('last_played_team_logo'),
+        record: doc1.get('record'),
+        earnings: doc1.get('earnings'),
+        logo: doc1.get('logo')
+    );
+    Team team2 = Team(
+        region: doc2.get('region'),
+        rank: doc2.get('rank'),
+        team: doc2.get('team'),
+        country: doc2.get('country'),
+        last_played: doc2.get('last_played'),
+        last_played_team: doc2.get('last_played_team'),
+        last_played_team_logo: doc2.get('last_played_team_logo'),
+        record: doc2.get('record'),
+        earnings: doc2.get('earnings'),
+        logo: doc2.get('logo')
+    );
+    return [team1, team2];
   }
 }

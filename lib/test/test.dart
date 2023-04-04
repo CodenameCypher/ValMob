@@ -1,27 +1,22 @@
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Test{
-  void test(){
-    String s1 = '12m';
-    String s2 = '13h 12m';
-    String s3 = '1d 0h';
-    String s4 = '10:00 PM';
+  void test() async{
+    String s1 = "6h 24m from now";
+    String s2 = "1d 1h from now";
 
-    print(DateTime.now());
-    DateTime date = calculateDateTime(s3); // date
-    DateTime time = DateFormat("hh:mm a",'en-us').parse(s4); // time
-    String dateTime = date.year.toString()+"-"+date.month.toString()+"-"+date.day.toString()+" "+s4;
-    DateTime dateParsed = DateFormat("yyyy-MM-dd hh:mm a","en-us").parse(date.year.toString()+"-"+date.month.toString()+"-"+date.day.toString()+" "+s4);
-    print(dateParsed);
-    print(dateTime);
+    calculateDateTime(s1);
+    // calculateDateTime(s2);
   }
-  
-  
+
   DateTime calculateDateTime(String eta){
     DateTime dateTime = DateTime.now();
     List<String> strings = eta.split(" ");
-    for(var i = 0; i < strings.length ; i++){
+    for(var i = 0; i < strings.length - 2 ; i++){
       String current = strings[i];
+      // print(current);
       if(current[current.length-1] == 'd'){
         dateTime = dateTime.add(Duration(days: int.parse(current.substring(0,current.length-1))));
       }
@@ -31,6 +26,44 @@ class Test{
         dateTime = dateTime.add(Duration(minutes: int.parse(current.substring(0,current.length-1))));
       }
     }
+    print("Prev time: "+dateTime.toString());
+    dateTime = alignDateTime(dateTime, Duration(minutes: 15), true);
+    DateTime dateTime2 = alignDateTime(dateTime, Duration(minutes: 15), false);
+    print("New time: "+dateTime.toString());
+    print("New time 2: "+dateTime2.toString());
+    print(dateTime.difference(dateTime2));
     return dateTime;
+  }
+
+  DateTime alignDateTime(DateTime dt, Duration alignment,bool roundUp) {
+    assert(alignment >= Duration.zero);
+    if (alignment == Duration.zero) return dt;
+    final correction = Duration(
+        days: 0,
+        hours: alignment.inDays > 0
+            ? dt.hour
+            : alignment.inHours > 0
+            ? dt.hour % alignment.inHours
+            : 0,
+        minutes: alignment.inHours > 0
+            ? dt.minute
+            : alignment.inMinutes > 0
+            ? dt.minute % alignment.inMinutes
+            : 0,
+        seconds: alignment.inMinutes > 0
+            ? dt.second
+            : alignment.inSeconds > 0
+            ? dt.second % alignment.inSeconds
+            : 0,
+        milliseconds: alignment.inSeconds > 0
+            ? dt.millisecond
+            : alignment.inMilliseconds > 0
+            ? dt.millisecond % alignment.inMilliseconds
+            : 0,
+        microseconds: alignment.inMilliseconds > 0 ? dt.microsecond : 0);
+    if (correction == Duration.zero) return dt;
+    final corrected = dt.subtract(correction);
+    final result = roundUp ? corrected.add(alignment) : corrected;
+    return result;
   }
 }
