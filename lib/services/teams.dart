@@ -84,4 +84,25 @@ class Teams{
     );
     return [team1, team2];
   }
+
+  List<Team> convertToTeamObject(QuerySnapshot s){
+    return s.docs.map((e){
+      return Team(
+          region: e.get('region'),
+          rank: e.get('rank'),
+          team: e.get('team'),
+          country: e.get('country'),
+          last_played: e.get('last_played'),
+          last_played_team: e.get('last_played_team'),
+          last_played_team_logo: e.get('last_played_team_logo'),
+          record: e.get('record'),
+          earnings: e.get('earnings'),
+          logo: e.get('logo')
+      );
+    }).toList();
+  }
+
+  Stream<List<Team>> get getTeamStream{
+    return ref.snapshots().map(convertToTeamObject);
+  }
 }

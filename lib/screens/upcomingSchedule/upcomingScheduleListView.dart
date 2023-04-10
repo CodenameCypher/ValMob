@@ -15,7 +15,7 @@ class _UpcomingScheduleListViewState extends State<UpcomingScheduleListView> {
   @override
   Widget build(BuildContext context) {
     final List<model.Match> matchList = Provider.of<List<model.Match>>(context);
-    return matchList.length == 0 ? Loading() : ListView.builder(
+    return matchList.length < 50 ? Loading() : ListView.builder(
         itemCount: matchList.length,
         itemBuilder: (context, index){
           return Padding(

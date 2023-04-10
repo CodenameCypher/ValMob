@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:valmob/screens/devDiary/devView.dart';
 import 'package:valmob/screens/news/newsView.dart';
+import 'package:valmob/screens/teams/teamsView.dart';
 import 'package:valmob/screens/upcomingSchedule/upcomingScheduleView.dart';
 import 'package:valmob/services/matches.dart';
 import 'package:valmob/services/news.dart';
@@ -21,23 +23,13 @@ class _homescreenState extends State<homescreen> {
   List<Widget> widgetList = [
     NewsView(),
     UpcomingScheduleView(),
-    Text(
-      'Teams',
-      style: TextStyle(
-          color: Colors.white,
-          fontSize: 60
-      ),
-    ),
-    Text(
-      'Dev Diaries',
-      style: TextStyle(
-          color: Colors.white,
-          fontSize: 60
-      ),
-    )
+    TeamsView(),
+    DevView()
   ];
   @override
   Widget build(BuildContext context) {
+    // News().updateDatabase();
+    // Matches().updateDatabase();
     return Scaffold(
       backgroundColor: shared.Theme.swatch1,
       appBar: AppBar(

@@ -32,6 +32,8 @@ class Test{
     print("New time: "+dateTime.toString());
     print("New time 2: "+dateTime2.toString());
     print(dateTime.difference(dateTime2));
+
+    print(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1));
     return dateTime;
   }
 

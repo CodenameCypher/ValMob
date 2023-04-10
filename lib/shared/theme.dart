@@ -7,6 +7,7 @@ class Theme{
   static Color royalBlue = Color(0xFF246EE9);
   static Color primary = Color(0xFF3EB489);
   static Color swatch1Light = Color(0XFF0c0e27);
+  static Color swatch1Lighter = Color(0XFF3C3D4E);
   static Color swatch1 = Color(0XFF080919);
   static Color swatch2 = Color(0XFF21265B);
   static Color swatch3 = Color(0XFF21265b);

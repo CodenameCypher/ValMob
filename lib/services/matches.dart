@@ -56,7 +56,7 @@ class Matches{
           'match_url': current.match_url,
           'event_name': current.event_name,
           'event_icon_url': current.event_icon_url,
-          'match_time': current.eta == "Upcoming" ? calculateDateTime('59m from now') : calculateDateTime(current.match_time),
+          'match_time': current.eta == "Upcoming" ? DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1) : calculateDateTime(current.match_time),
           'eta': current.eta,
           'flag1': current.flag1,
           'flag2': current.flag2,

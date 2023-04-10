@@ -9,6 +9,7 @@ class UpcomingScheduleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Matches().updateDatabase();
     return StreamProvider<List<model.Match>>.value(
         value: Matches().getMatch,
         initialData: [],

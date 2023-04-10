@@ -9,6 +9,7 @@ class NewsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    services.News().updateDatabase();
     return StreamProvider<List<model.News>>.value(
         value: services.News().getNews,
         initialData: [],
