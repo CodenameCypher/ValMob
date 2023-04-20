@@ -47,6 +47,7 @@ dependencies:
   url_launcher: ^6.1.8
   dio: ^5.1.1
   flutter_native_splash: ^2.2.18
+  marquee: ^2.2.3
 
 
 dev_dependencies:
@@ -90,6 +91,15 @@ flutter:
     - family: ValFont
       fonts:
         - asset: fonts/valfont.ttf
+    - family: Font2
+      fonts:
+        - asset: fonts/Debrosee-ALPnL.ttf
+    - family: Font3
+      fonts:
+          - asset: fonts/Jurasick-K7gnA.ttf
+    - family: Font4
+      fonts:
+          - asset: fonts/Sportviper-p790O.otf
 #    - family: RobotoMono
 #      fonts:
 #        - asset: fonts/RobotoMono-Regular.ttf
