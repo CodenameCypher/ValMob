@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:valmob/screens/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:valmob/shared/theme.dart' as shared;
@@ -20,6 +21,8 @@ class ValMob extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: homescreen(),
+      navigatorObservers: [FlutterSmartDialog.observer],
+      builder: FlutterSmartDialog.init(),
     );
   }
 }

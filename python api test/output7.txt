@@ -1,9 +1,0 @@
-rank
-team
-country
-last_played
-last_played_team
-last_played_team_logo
-record
-earnings
-logo

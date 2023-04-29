@@ -30,7 +30,7 @@ class Teams{
         );
       }
     }
-    print("Teams API Fetched.");
+    print("Teams API Fetched. Length: "+teamList.length.toString());
     return teamList;
   }
 

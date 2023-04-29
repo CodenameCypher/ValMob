@@ -18,7 +18,7 @@ class _UpcomingScheduleListViewState extends State<UpcomingScheduleListView> {
     return matchList.length < 50 ? Loading() : ListView.builder(
         itemCount: matchList.length,
         itemBuilder: (context, index){
-          return matchList[index].eta != "LIVE" && DateTime.parse(matchList[index].match_time).compareTo(DateTime.now()) < 0 ? SizedBox(height: 0,) : Padding(
+          return Padding(
               padding: EdgeInsets.all(10),
             child: UpcomingScheduleCard(match: matchList[index]),
           );

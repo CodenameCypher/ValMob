@@ -1,71 +1,78 @@
-import 'package:intl/intl.dart';
+import 'package:html/dom.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:html/parser.dart' as parser;
+import 'package:intl/intl.dart';
 
 class Test{
   void test() async{
-    String s1 = "6h 24m from now";
-    String s2 = "1d 1h from now";
-
-    calculateDateTime(s1);
-    // calculateDateTime(s2);
+    var response = await http.get(Uri.parse("https://www.vlr.gg/204031/medal-esports-vs-true-rippers-challengers-league-south-asia-split-2-w1"));
+    var document = parser.parse(response.body);
+    List<Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
+    List<Element> team1 = elems[0].children[1].children;
+    List<Element> team2 = elems[1].children[1].children;
+    String team1Players = "";
+    String team2Players = "";
+    team1.forEach((element) {
+      team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+    });
+    team2.forEach((element) {
+      team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+    });
   }
 
-  DateTime calculateDateTime(String eta){
-    DateTime dateTime = DateTime.now();
-    List<String> strings = eta.split(" ");
-    for(var i = 0; i < strings.length - 2 ; i++){
-      String current = strings[i];
-      // print(current);
-      if(current[current.length-1] == 'd'){
-        dateTime = dateTime.add(Duration(days: int.parse(current.substring(0,current.length-1))));
-      }
-      else if(current[current.length-1] == 'h'){
-        dateTime = dateTime.add(Duration(hours: int.parse(current.substring(0,current.length-1))));
-      }else{
-        dateTime = dateTime.add(Duration(minutes: int.parse(current.substring(0,current.length-1))));
+  Future<List<String>> getMatchPlayers(url) async{
+    var response = await http.get(Uri.parse(url));
+    var document = parser.parse(response.body);
+    List<Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
+    List<Element> team1 = elems[0].children[1].children;
+    List<Element> team2 = elems[1].children[1].children;
+    String team1Players = "";
+    String team2Players = "";
+    team1.forEach((element) {
+      team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+    });
+    team2.forEach((element) {
+      team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+    });
+    return [team1Players, team2Players];
+  }
+
+  Future<Map<String, String>> scrapeSite(url) async{
+    var urlScraping = Uri.parse(url);
+    var responseHTML = await http.get(urlScraping);
+    var document = parser.parse(responseHTML.body);
+
+    var dateTime = document.getElementsByClassName('moment-tz-convert');
+    var dateTimeString = '';
+    for(int i = 0; i < dateTime.length; i++){
+      dateTimeString += dateTime[i].text.trim() + " ";
+    }
+    var logo1 = document.getElementsByClassName('match-header-link wf-link-hover mod-1')[0].getElementsByTagName('img')[0].attributes['src'];
+    var logo2 = document.getElementsByClassName('match-header-link wf-link-hover mod-2')[0].getElementsByTagName('img')[0].attributes['src'];
+    
+    List<Element> lst = document.getElementsByClassName("wf-card mod-dark match-streams-btn").where((element) => element.attributes.containsKey('href')).toList() + document.getElementsByClassName("match-streams-btn-external").where((element) => element.attributes.containsKey('href')).toList();
+    String streams = "";
+    for(int i = 0; i < lst.length; i++){
+      streams += lst[i].attributes['href']! + " ";
+    }
+
+    DateTime dt;
+    try{
+      dt = DateFormat("EEEE, MMMM dd'th' hh:mm aa ZZ").parse(dateTimeString);
+    }catch(e){
+      try{
+        dt = DateFormat("EEEE, MMMM dd'st' hh:mm aa ZZ").parse(dateTimeString);
+      }catch(e){
+        dt = DateFormat("EEEE, MMMM dd'rd' hh:mm aa ZZ").parse(dateTimeString);
       }
     }
-    print("Prev time: "+dateTime.toString());
-    dateTime = alignDateTime(dateTime, Duration(minutes: 15), true);
-    DateTime dateTime2 = alignDateTime(dateTime, Duration(minutes: 15), false);
-    print("New time: "+dateTime.toString());
-    print("New time 2: "+dateTime2.toString());
-    print(dateTime.difference(dateTime2));
 
-    print(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1));
-    return dateTime;
-  }
-
-  DateTime alignDateTime(DateTime dt, Duration alignment,bool roundUp) {
-    assert(alignment >= Duration.zero);
-    if (alignment == Duration.zero) return dt;
-    final correction = Duration(
-        days: 0,
-        hours: alignment.inDays > 0
-            ? dt.hour
-            : alignment.inHours > 0
-            ? dt.hour % alignment.inHours
-            : 0,
-        minutes: alignment.inHours > 0
-            ? dt.minute
-            : alignment.inMinutes > 0
-            ? dt.minute % alignment.inMinutes
-            : 0,
-        seconds: alignment.inMinutes > 0
-            ? dt.second
-            : alignment.inSeconds > 0
-            ? dt.second % alignment.inSeconds
-            : 0,
-        milliseconds: alignment.inSeconds > 0
-            ? dt.millisecond
-            : alignment.inMilliseconds > 0
-            ? dt.millisecond % alignment.inMilliseconds
-            : 0,
-        microseconds: alignment.inMilliseconds > 0 ? dt.microsecond : 0);
-    if (correction == Duration.zero) return dt;
-    final corrected = dt.subtract(correction);
-    final result = roundUp ? corrected.add(alignment) : corrected;
-    return result;
+    Map<String, String> results = {
+      'DateTime' : dt.toString(),
+      'logo1' : logo1.toString(),
+      'logo2' : logo2.toString(),
+      'streams' : streams
+    };
+    return results;
   }
 }

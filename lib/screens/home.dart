@@ -5,11 +5,12 @@ import 'package:valmob/screens/teams/teamsView.dart';
 import 'package:valmob/screens/upcomingSchedule/upcomingScheduleView.dart';
 import 'package:valmob/services/matches.dart';
 import 'package:valmob/services/news.dart';
-import 'package:valmob/services/players.dart';
-import 'package:valmob/services/teams.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:valmob/services/teams.dart';
+import 'package:valmob/shared/loading.dart';
 import 'package:valmob/test/test.dart';
 import 'package:valmob/shared/theme.dart' as shared;
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class homescreen extends StatefulWidget {
   const homescreen({Key? key}) : super(key: key);
@@ -53,19 +54,27 @@ class _homescreenState extends State<homescreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: shared.Theme.swatch6,
         child: Icon(Icons.refresh),
-        onPressed: (){
+        onPressed: () async{
           print('action button pressed');
-          print(_bottomNavIndex);
           if(_bottomNavIndex == 0) {
             News().updateDatabase();
+            SmartDialog.showLoading(builder: (_) => Loading());
+            await Future.delayed(Duration(seconds: 1));
+            SmartDialog.dismiss();
           }
           else if(_bottomNavIndex == 1) {
             Matches().updateDatabase();
+            SmartDialog.showLoading(builder: (_) => Loading());
+            await Future.delayed(Duration(seconds: 3));
+            SmartDialog.dismiss();
           }
           else if(_bottomNavIndex == 2) {
-            Test().test();
+            Teams().updateDatabase();
+            SmartDialog.showLoading(builder: (_) => Loading());
+            await Future.delayed(Duration(seconds: 3));
+            SmartDialog.dismiss();
           }
-          // Test().test();
+          Test().test();
         },
 
       ),
