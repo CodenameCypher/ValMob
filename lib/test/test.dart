@@ -5,18 +5,16 @@ import 'package:intl/intl.dart';
 
 class Test{
   void test() async{
-    var response = await http.get(Uri.parse("https://www.vlr.gg/204757/moist-moguls-guild-x-kone-news-almost-missed-april-29"));
-    var document = parser.parse(response.body);
-    Element elem = document.getElementsByClassName('article-body')[0];
-    List<Element> elemsRemove = elem.getElementsByClassName('wf-hover-card');
+    var url = "https://www.vlr.gg/184477/paper-rex-vs-global-esports-champions-tour-2023-pacific-league-w5";
+    print(await getMatchPlayers(url));
   }
 
   Future<List<String>> getMatchPlayers(url) async{
     var response = await http.get(Uri.parse(url));
     var document = parser.parse(response.body);
-    List<Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
-    List<Element> team1 = elems[0].children[1].children;
-    List<Element> team2 = elems[1].children[1].children;
+    List<Element> elems = document.getElementsByClassName("vm-stats-game").where((element) => element.attributes['data-game-id'] == 'all').toList();
+    List<Element> team1 = elems[0].children[1].children[0].children[0].children[1].children;
+    List<Element> team2 = elems[0].children[1].children[1].children[0].children[1].children;
     String team1Players = "";
     String team2Players = "";
     team1.forEach((element) {

@@ -74,7 +74,7 @@ class _homescreenState extends State<homescreen> {
             await Future.delayed(Duration(seconds: 3));
             SmartDialog.dismiss();
           }
-          Test().test();
+          // Test().test();
         },
 
       ),

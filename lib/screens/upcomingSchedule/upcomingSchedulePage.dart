@@ -55,17 +55,32 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
       }
     }
 
-    List<dom.Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
-    List<dom.Element> team1 = elems[0].children[1].children;
-    List<dom.Element> team2 = elems[1].children[1].children;
     String team1Players = "";
     String team2Players = "";
-    team1.forEach((element) {
-      team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
-    });
-    team2.forEach((element) {
-      team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
-    });
+
+    try{
+      List<dom.Element> elems = document.getElementsByClassName("vm-stats-game").where((element) => element.attributes['data-game-id'] == 'all').toList();
+      List<dom.Element> team1 = elems[0].children[1].children[0].children[0].children[1].children;
+      List<dom.Element> team2 = elems[0].children[1].children[1].children[0].children[1].children;
+      team1.forEach((element) {
+        team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+      });
+      team2.forEach((element) {
+        team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+      });
+    }catch(e){
+      List<dom.Element> elems = document.getElementsByClassName("vm-stats-game").where((element) => element.attributes['data-game-id'] == 'all').toList();
+      List<dom.Element> team1 = elems[0].children[0].children[0].children[0].children[1].children;
+      List<dom.Element> team2 = elems[0].children[0].children[1].children[0].children[1].children;
+      team1.forEach((element) {
+        team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+      });
+      team2.forEach((element) {
+        team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+      });
+    }
+
+    String maps = widget.m.eta == "LIVE" ? document.getElementsByClassName("match-header-note")[0].text.trim() : "-";
 
     Map<String, String> results = {
       'DateTime' : DateTime(DateTime.now().year, dt.month, dt.day, dt.hour, dt.minute).toString(),
@@ -73,7 +88,8 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
       'logo2' : logo2.toString(),
       'streams' : streams,
       'team_one_players' : team1Players,
-      'team_two_players' : team2Players
+      'team_two_players' : team2Players,
+      'maps': maps
     };
     return results;
   }
@@ -86,6 +102,8 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
         streamLinks = extraInfo['streams']!.split(" ");
         team1Players = extraInfo['team_one_players']!.split(",");
         team2Players = extraInfo['team_two_players']!.split(",");
+        team1Players.removeAt(team1Players.length - 1);
+        team2Players.removeAt(team2Players.length - 1);
         isLoading = false;
       });
     });
@@ -393,58 +411,79 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
             color: Colors.grey,
           ),
 
-          IntrinsicHeight(
+          widget.m.eta == "LIVE" ? Container(
+              padding: EdgeInsets.fromLTRB(23,0,23,0),
+              child: Text(
+                "Maps",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    height: 2,
+                    fontWeight: FontWeight.bold
+                ),
+              )
+          ) : SizedBox(height: 0,),
+
+          widget.m.eta == "LIVE" ? Container(
+            padding: EdgeInsets.fromLTRB(23,0,23,11),
+            child: Text(
+              extraInfo['maps']!,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 11,
+                  height: 2
+              ),
+            )
+          ) : SizedBox(height: 0,),
+
+
+          widget.m.eta == "LIVE" ? Divider(
+            thickness: 1,
+            indent: 20,
+            endIndent: 20,
+            color: Colors.grey,
+          ) : SizedBox(height: 0,),
+
+
+          Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.22,
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(8),
                         child: Text(
-                            team1Players[0],
+                          widget.m.team_one_name,
                           style: TextStyle(
-                            color: Colors.white,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team1Players[1],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team1Players[2],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team1Players[3],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team1Players[4],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                      Expanded(
+                          child: ListView.builder(
+                              itemCount: team1Players.length,
+                              itemBuilder: (context, index){
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    team1Players[index],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 12
+                                    ),
+                                  ),
+                                );
+                              }
+                          )
                       )
                     ],
                   ),
@@ -452,58 +491,43 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                 VerticalDivider(
                   width: 20,
                   thickness: 1,
-                  indent: 10,
-                  endIndent: 10,
+                  indent: 20,
+                  endIndent: 20,
                   color: Colors.grey,
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.22,
                   child: Column(
                     children: [
                       Padding(
                         padding: EdgeInsets.all(8),
                         child: Text(
-                          team2Players[0],
+                          widget.m.team_two_name,
                           style: TextStyle(
                             color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team2Players[1],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team2Players[2],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team2Players[3],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          team2Players[4],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
+                      Expanded(
+                          child: ListView.builder(
+                              itemCount: team2Players.length,
+                              itemBuilder: (context, index){
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    team2Players[index],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.grey[400],
+                                        fontSize: 12
+                                    ),
+                                  ),
+                                );
+                              }
+                          )
                       )
                     ],
                   ),
@@ -517,6 +541,20 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
             indent: 20,
             endIndent: 20,
             color: Colors.grey,
+          ),
+
+          Container(
+              padding: EdgeInsets.fromLTRB(23,0,23,3),
+              child: Text(
+                "Stream Links",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    height: 2,
+                    fontWeight: FontWeight.bold
+                ),
+              )
           ),
 
           Expanded(
