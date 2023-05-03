@@ -4,20 +4,92 @@ import 'package:intl/intl.dart';
 import 'package:marquee/marquee.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:valmob/models/matches.dart' as model;
+import 'package:valmob/shared/loading.dart';
 import 'package:valmob/shared/theme.dart' as shared;
 import '../../models/team.dart';
 import '../../services/flags.dart';
 import '../../services/teams.dart';
+import 'package:html/parser.dart' as parser;
+import 'package:http/http.dart' as http;
+import 'package:html/dom.dart' as dom;
 
-class UpcomingSchedulePage extends StatelessWidget {
+class UpcomingSchedulePage extends StatefulWidget {
   model.Match m;
   UpcomingSchedulePage({required this.m});
 
   @override
+  State<UpcomingSchedulePage> createState() => _UpcomingSchedulePageState();
+}
+
+class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
+  Map<String, String> extraInfo = {};
+  bool isLoading = true;
+  List<String> streamLinks = [];
+  List<String> team1Players = ["-","-","-","-","-"];
+  List<String> team2Players = ["-","-","-","-","-"];
+
+  Future<Map<String, String>> scrapeSite(url) async{
+    var urlScraping = Uri.parse(url);
+    var responseHTML = await http.get(urlScraping);
+    var document = parser.parse(responseHTML.body);
+    var dateTime = document.getElementsByClassName('moment-tz-convert');
+    var dateTimeString = '';
+    for(int i = 0; i < dateTime.length; i++){
+      dateTimeString += dateTime[i].text.trim() + " ";
+    }
+    var logo1 = document.getElementsByClassName('match-header-link wf-link-hover mod-1')[0].getElementsByTagName('img')[0].attributes['src'];
+    var logo2 = document.getElementsByClassName('match-header-link wf-link-hover mod-2')[0].getElementsByTagName('img')[0].attributes['src'];
+    List<dom.Element> lst = document.getElementsByClassName("wf-card mod-dark match-streams-btn").where((element) => element.attributes.containsKey('href')).toList() + document.getElementsByClassName("match-streams-btn-external").where((element) => element.attributes.containsKey('href')).toList();
+    String streams = "";
+    for(int i = 0; i < lst.length; i++){
+      streams += lst[i].attributes['href']! + " ";
+    }
+    DateTime dt;
+    try{
+      dt = DateFormat("EEEE, MMMM dd'th' hh:mm aa ZZ").parse(dateTimeString);
+    }catch(e){
+      try{
+        dt = DateFormat("EEEE, MMMM dd'st' hh:mm aa ZZ").parse(dateTimeString);
+      }catch(e){
+        dt = DateFormat("EEEE, MMMM dd'rd' hh:mm aa ZZ").parse(dateTimeString);
+      }
+    }
+
+    List<dom.Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
+    List<dom.Element> team1 = elems[0].children[1].children;
+    List<dom.Element> team2 = elems[1].children[1].children;
+    String team1Players = "";
+    String team2Players = "";
+    team1.forEach((element) {
+      team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+    });
+    team2.forEach((element) {
+      team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+    });
+
+    Map<String, String> results = {
+      'DateTime' : DateTime(DateTime.now().year, dt.month, dt.day, dt.hour, dt.minute).toString(),
+      'logo1' : logo1.toString(),
+      'logo2' : logo2.toString(),
+      'streams' : streams,
+      'team_one_players' : team1Players,
+      'team_two_players' : team2Players
+    };
+    return results;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<String> streamLinks = m.streams.split(" ");
-    List<String> team1Players = m.team_one_players.split(",");
-    List<String> team2Players = m.team_two_players.split(",");
+    this.scrapeSite("https://vlr.gg"+widget.m.match_url).then((value){
+      setState(() {
+        extraInfo = value;
+        streamLinks = extraInfo['streams']!.split(" ");
+        team1Players = extraInfo['team_one_players']!.split(",");
+        team2Players = extraInfo['team_two_players']!.split(",");
+        isLoading = false;
+      });
+    });
+
     return Scaffold(
       backgroundColor: shared.Theme.swatch1,
       appBar: AppBar(
@@ -37,7 +109,7 @@ class UpcomingSchedulePage extends StatelessWidget {
         backgroundColor: shared.Theme.swatch2,
         elevation: 0,
       ),
-      body: Column(
+      body: isLoading ? Loading() : Column(
         children: [
           Container(
             color: shared.Theme.swatch1,
@@ -47,14 +119,14 @@ class UpcomingSchedulePage extends StatelessWidget {
               title: Column(
                 children: [
                   Text(
-                    this.m.event_name,
+                    this.widget.m.event_name,
                     style: TextStyle(
                         color: Colors.grey,
                         fontSize: 10
                     ),
                   ),
                   FutureBuilder(
-                    future: Teams().getTeam(this.m.team_one_name, this.m.team_two_name),
+                    future: Teams().getTeam(this.widget.m.team_one_name, this.widget.m.team_two_name),
                     builder: (context, t){
                       List<Team>? snapshot = t.data;
                       return Row(
@@ -76,13 +148,13 @@ class UpcomingSchedulePage extends StatelessWidget {
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.only(bottom: 7),
-                                    child: m.eta == "LIVE" ? Image.network("https:" + m.team_one_logo, height: 40, width: 40,) : snapshot != null && snapshot[0] != null && snapshot[0].logo != "" ?
-                                    Image.network("https:"+snapshot[0].logo, height: 40, width: 40,)
-                                        :
-                                    Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40),
+                                  child: extraInfo['logo1'] == "/img/vlr/tmp/vlr.png" ?
+                                  Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
+                                      :
+                                  Image.network("https:"+extraInfo['logo1']!, height: 40, width: 40,)
                                   ),
-                                  this.m.team_one_name.split(" ").length == 1 ? Text(
-                                    this.m.team_one_name,
+                                  this.widget.m.team_one_name.split(" ").length == 1 ? Text(
+                                    this.widget.m.team_one_name,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Colors.white,
@@ -94,7 +166,7 @@ class UpcomingSchedulePage extends StatelessWidget {
                                     height: 20,
                                     width: 70,
                                     child: Marquee(
-                                      text: this.m.team_one_name,
+                                      text: this.widget.m.team_one_name,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -117,11 +189,11 @@ class UpcomingSchedulePage extends StatelessWidget {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Image.network(
-                                            Flag().getLink(this.m.flag1),
+                                            Flag().getLink(this.widget.m.flag1),
                                             width: 12,
                                           ),
                                           Text(
-                                            " " + Flag().getName(this.m.flag1),
+                                            " " + Flag().getName(this.widget.m.flag1),
                                             style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 8.5
@@ -144,7 +216,7 @@ class UpcomingSchedulePage extends StatelessWidget {
                                         Opacity(
                                           opacity: 0.2,
                                           child: Image.network(
-                                            this.m.event_icon_url,
+                                            this.widget.m.event_icon_url,
                                             height: 40,
                                           ),
                                         ),
@@ -180,13 +252,13 @@ class UpcomingSchedulePage extends StatelessWidget {
                                   children: [
                                     Padding(
                                       padding: EdgeInsets.only(bottom: 7),
-                                      child: m.eta == "LIVE" ? Image.network("https:" + m.team_two_logo, height: 40, width: 40,) :snapshot != null && snapshot[1] != null && snapshot[1].logo != "" ?
-                                      Image.network("https:"+snapshot[1].logo, height: 40,width: 40)
+                                      child: extraInfo['logo2'] == "/img/vlr/tmp/vlr.png" ?
+                                      Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
                                           :
-                                      Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40),
+                                      Image.network("https:"+extraInfo['logo2']!, height: 40, width: 40,)
                                     ),
-                                    this.m.team_two_name.split(" ").length == 1 ? Text(
-                                      this.m.team_two_name,
+                                    this.widget.m.team_two_name.split(" ").length == 1 ? Text(
+                                      this.widget.m.team_two_name,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white,
@@ -198,7 +270,7 @@ class UpcomingSchedulePage extends StatelessWidget {
                                       height: 20,
                                       width: 70,
                                       child: Marquee(
-                                        text: this.m.team_two_name,
+                                        text: this.widget.m.team_two_name,
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -221,11 +293,11 @@ class UpcomingSchedulePage extends StatelessWidget {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Image.network(
-                                              Flag().getLink(this.m.flag2),
+                                              Flag().getLink(this.widget.m.flag2),
                                               width: 12,
                                             ),
                                             Text(
-                                              " " + Flag().getName(this.m.flag2),
+                                              " " + Flag().getName(this.widget.m.flag2),
                                               style: TextStyle(
                                                   color: Colors.grey,
                                                   fontSize: 8.5
@@ -246,14 +318,14 @@ class UpcomingSchedulePage extends StatelessWidget {
               ),
               subtitle: Column(
                 children: [
-                  this.m.eta == "LIVE" ?
+                  this.widget.m.eta == "LIVE" ?
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
                         flex: 1,
                         child: Text(
-                          this.m.score1,
+                          this.widget.m.score1,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.white60,
@@ -286,7 +358,7 @@ class UpcomingSchedulePage extends StatelessWidget {
                       Expanded(
                         flex: 1,
                         child: Text(
-                          this.m.score2,
+                          this.widget.m.score2,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.white60,
@@ -298,7 +370,7 @@ class UpcomingSchedulePage extends StatelessWidget {
                   )
                       :
                   Text(
-                    DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(this.m.match_time)).toString() + "\n" + this.m.eta,
+                    DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(extraInfo['DateTime']!)).toString() + "\n" + this.widget.m.eta,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white60,
@@ -321,7 +393,7 @@ class UpcomingSchedulePage extends StatelessWidget {
             color: Colors.grey,
           ),
 
-          this.m.eta != "LIVE" ? SizedBox(height: 0,) : IntrinsicHeight(
+          IntrinsicHeight(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -440,7 +512,7 @@ class UpcomingSchedulePage extends StatelessWidget {
             ),
           ),
 
-          this.m.eta != "LIVE" ? SizedBox(height: 0,) : Divider(
+          Divider(
             thickness: 1,
             indent: 20,
             endIndent: 20,

@@ -5,19 +5,10 @@ import 'package:intl/intl.dart';
 
 class Test{
   void test() async{
-    var response = await http.get(Uri.parse("https://www.vlr.gg/204031/medal-esports-vs-true-rippers-challengers-league-south-asia-split-2-w1"));
+    var response = await http.get(Uri.parse("https://www.vlr.gg/204757/moist-moguls-guild-x-kone-news-almost-missed-april-29"));
     var document = parser.parse(response.body);
-    List<Element> elems = document.getElementsByClassName("wf-table-inset mod-overview");
-    List<Element> team1 = elems[0].children[1].children;
-    List<Element> team2 = elems[1].children[1].children;
-    String team1Players = "";
-    String team2Players = "";
-    team1.forEach((element) {
-      team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
-    });
-    team2.forEach((element) {
-      team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
-    });
+    Element elem = document.getElementsByClassName('article-body')[0];
+    List<Element> elemsRemove = elem.getElementsByClassName('wf-hover-card');
   }
 
   Future<List<String>> getMatchPlayers(url) async{

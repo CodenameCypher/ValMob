@@ -61,7 +61,7 @@ class UpcomingScheduleCard extends StatelessWidget {
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.only(bottom: 7),
-                                        child: match.eta == "LIVE" ? Image.network("https:" + match.team_one_logo, height: 40, width: 40,) : snapshot != null && snapshot[0] != null && snapshot[0].logo != "" ?
+                                        child: snapshot != null && snapshot[0] != null && snapshot[0].logo != "" ?
                                         Image.network("https:"+snapshot[0].logo, height: 40, width: 40,)
                                         :
                                         Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40),
@@ -165,7 +165,7 @@ class UpcomingScheduleCard extends StatelessWidget {
                                       children: [
                                         Padding(
                                           padding: EdgeInsets.only(bottom: 7),
-                                          child: match.eta == "LIVE" ? Image.network("https:" + match.team_two_logo, height: 40, width: 40,) :snapshot != null && snapshot[1] != null && snapshot[1].logo != "" ?
+                                          child: snapshot != null && snapshot[1] != null && snapshot[1].logo != "" ?
                                           Image.network("https:"+snapshot[1].logo, height: 40,width: 40)
                                               :
                                           Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40),
@@ -293,24 +293,11 @@ class UpcomingScheduleCard extends StatelessWidget {
               ],
             ),
 
-            onTap: () async{
-              if(match.eta == "LIVE" || match.eta == "Upcoming"){
+            onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => UpcomingSchedulePage(m: this.match)));
-              }else{
-                await launchUrl(
-                    Uri.parse("https://vlr.gg"+this.match.match_url),
-                    mode: LaunchMode.inAppWebView
-                );
-              }
             },
           ),
         )
     );
-    // return Text(
-    //     this.news.title,
-    //     style: TextStyle(
-    //         color: Colors.white
-    //     ),
-    //   );
   }
 }
