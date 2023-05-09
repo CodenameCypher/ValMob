@@ -79,9 +79,12 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
         team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
       });
     }
-
-    String maps = widget.m.eta == "LIVE" ? document.getElementsByClassName("match-header-note")[0].text.trim() : "-";
-
+    String maps = "";
+    try{
+       maps = widget.m.eta == "LIVE" ? document.getElementsByClassName("match-header-note")[0].text.trim() : "-";
+    }catch(e){
+      maps = "---";
+    }
     Map<String, String> results = {
       'DateTime' : DateTime(DateTime.now().year, dt.month, dt.day, dt.hour, dt.minute).toString(),
       'logo1' : logo1.toString(),
@@ -411,7 +414,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
             color: Colors.grey,
           ),
 
-          widget.m.eta == "LIVE" ? Container(
+          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Container(
               padding: EdgeInsets.fromLTRB(23,0,23,0),
               child: Text(
                 "Maps",
@@ -425,7 +428,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
               )
           ) : SizedBox(height: 0,),
 
-          widget.m.eta == "LIVE" ? Container(
+          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Container(
             padding: EdgeInsets.fromLTRB(23,0,23,11),
             child: Text(
               extraInfo['maps']!,
@@ -439,7 +442,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
           ) : SizedBox(height: 0,),
 
 
-          widget.m.eta == "LIVE" ? Divider(
+          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Divider(
             thickness: 1,
             indent: 20,
             endIndent: 20,

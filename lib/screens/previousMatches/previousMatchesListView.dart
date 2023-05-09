@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:valmob/models/team.dart';
-import 'package:valmob/screens/teams/teamsCard.dart';
+import 'package:valmob/screens/previousMatches/previousMatchesCard.dart';
 import 'package:valmob/shared/loading.dart';
+import 'package:valmob/models/matches.dart' as model;
 import 'package:valmob/shared/theme.dart' as shared;
 
-
-class TeamsListView extends StatefulWidget {
-  const TeamsListView({Key? key}) : super(key: key);
+class PreviousMatchesListView extends StatefulWidget {
+  const PreviousMatchesListView({Key? key}) : super(key: key);
 
   @override
-  State<TeamsListView> createState() => _TeamsListViewState();
+  State<PreviousMatchesListView> createState() => _PreviousMatchesListViewState();
 }
 
-class _TeamsListViewState extends State<TeamsListView> {
+class _PreviousMatchesListViewState extends State<PreviousMatchesListView> {
   String query = "";
 
   @override
   Widget build(BuildContext context) {
-    List<Team> teamsList = Provider.of<List<Team>>(context);
-    return teamsList.length <= 30 ? Loading() : Column(
+    final List<model.Match> matchList = Provider.of<List<model.Match>>(context);
+    return matchList.length < 50 ? Loading() : Column(
       children: [
         Expanded(
           flex: 1,
@@ -70,18 +69,18 @@ class _TeamsListViewState extends State<TeamsListView> {
         Expanded(
           flex: 10,
           child: ListView.builder(
-              itemCount: teamsList.length,
+              itemCount: matchList.length,
               itemBuilder: (context, index){
                 if(this.query == ""){
                   return Padding(
-                    padding: EdgeInsets.all(0),
-                    child: TeamsCard(teamsList[index]),
+                    padding: EdgeInsets.all(10),
+                    child: PreviousMatchesCard(match: matchList[index]),
                   );
                 }else{
-                  if(teamsList[index].team.toLowerCase().startsWith(query.toLowerCase()) || teamsList[index].country.toLowerCase().startsWith(query.toLowerCase()) || teamsList[index].region.toLowerCase().contains(query.toLowerCase())){
+                  if(matchList[index].team_one_name.toLowerCase().startsWith(query.toLowerCase()) || matchList[index].team_two_name.toLowerCase().startsWith(query.toLowerCase()) || matchList[index].event_name.toLowerCase().contains(query.toLowerCase())){
                     return Padding(
-                      padding: EdgeInsets.all(0),
-                      child: TeamsCard(teamsList[index]),
+                      padding: EdgeInsets.all(10),
+                      child: PreviousMatchesCard(match: matchList[index]),
                     );
                   }else{
                     return SizedBox(height: 0,);

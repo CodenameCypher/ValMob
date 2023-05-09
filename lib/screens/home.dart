@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:valmob/screens/devDiary/devView.dart';
 import 'package:valmob/screens/news/newsView.dart';
+import 'package:valmob/screens/previousMatches/previousMatchesView.dart';
 import 'package:valmob/screens/teams/teamsView.dart';
 import 'package:valmob/screens/upcomingSchedule/upcomingScheduleView.dart';
 import 'package:valmob/services/matches.dart';
 import 'package:valmob/services/news.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:valmob/services/previousMatches.dart';
 import 'package:valmob/services/teams.dart';
 import 'package:valmob/shared/loading.dart';
 import 'package:valmob/test/test.dart';
@@ -24,14 +26,14 @@ class _homescreenState extends State<homescreen> {
   List<Widget> widgetList = [
     NewsView(),
     UpcomingScheduleView(),
+    PreviousMatchesView(),
     TeamsView(),
     DevView()
   ];
   @override
   Widget build(BuildContext context) {
-    // News().updateDatabase();
-    // Matches().updateDatabase();
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: shared.Theme.swatch1,
       appBar: AppBar(
         shape: RoundedRectangleBorder(
@@ -69,6 +71,12 @@ class _homescreenState extends State<homescreen> {
             SmartDialog.dismiss();
           }
           else if(_bottomNavIndex == 2) {
+            PreviousMatches().updateDatabase();
+            SmartDialog.showLoading(builder: (_) => Loading());
+            await Future.delayed(Duration(seconds: 3));
+            SmartDialog.dismiss();
+          }
+          else if(_bottomNavIndex == 3) {
             Teams().updateDatabase();
             SmartDialog.showLoading(builder: (_) => Loading());
             await Future.delayed(Duration(seconds: 3));
@@ -80,7 +88,7 @@ class _homescreenState extends State<homescreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar(
-        icons: [Icons.newspaper_rounded ,Icons.calendar_month, Icons.groups_sharp,Icons.construction],
+        icons: [Icons.newspaper_rounded ,Icons.calendar_month, Icons.grading, Icons.groups_sharp,Icons.construction],
         activeIndex: _bottomNavIndex,
         gapLocation: GapLocation.end,
         notchSmoothness: NotchSmoothness.softEdge,

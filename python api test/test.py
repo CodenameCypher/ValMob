@@ -1,17 +1,12 @@
+import json
 import requests
-from bs4 import BeautifulSoup as bs
 
-def scarpeInfo(url):
-    response = bs(requests.get(url).text, "html.parser")
+url = "https://vlrggapi.vercel.app/match/results"
 
-    list1 = response.find_all('div', {'class':"text-of"})
-    list2 = response.find_all('div', {'class':"ge-text-light"})
-    
-    for i in list1:
-        print(i)
+response = requests.get(url)
 
-    print("----------------------------------------------------")
+json  = json.loads(response.text)
 
-
-scarpeInfo("https://www.vlr.gg/184482/t1-vs-detonation-focusme-champions-tour-2023-pacific-league-w6")
-
+for i in json['data']['segments']:
+    # print(i.keys())
+    print(i['team1'] + " " + i['score1'] + " V/S " + i['score2'] + " " + i['team2'] + " - " + i['time_completed'])
