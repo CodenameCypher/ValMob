@@ -1,16 +1,21 @@
-# valmob
+# ValMob - Valorant Esports Scheduling App
 
-Valorant Esports App
+ValMob is an Android application designed to provide users with up-to-date information about Valorant esports tournaments, matches, statistics, and news. This app aims to keep Valorant enthusiasts informed and engaged with the latest happenings in the competitive gaming scene.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+1. **Tournament Schedule**: ValMob displays a comprehensive schedule of upcoming Valorant tournaments, including their dates, times, and participating teams. Users can easily browse through the schedule to find the events they are interested in.
 
-A few resources to get you started if this is your first Flutter project:
+2. **Live Match Updates**: ValMob provides real-time updates during ongoing Valorant matches. Users can access live scores, game statistics, and other relevant information to stay engaged with the action.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+3. **Match Results and Highlights**: ValMob provides match results and highlights for completed Valorant matches. Users can catch up on the action they missed and relive the exciting moments from past tournaments.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+4. **News Updates**: ValMob keeps users up to date with the latest news from the Valorant esports industry. Users can access news articles, interviews, and analysis to stay informed about the happenings in the community.
+
+## Contact
+
+If you have any questions, suggestions, or feedback regarding ValMob, please contact me at adityaroy083@gmail.com.
+
+Happy gaming!
+
+![image info](./readme_logo.png)
