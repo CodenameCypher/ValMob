@@ -24,7 +24,7 @@ class UpcomingSchedulePage extends StatefulWidget {
 class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
   Map<String, dynamic> extraInfo = {};
   bool isLoading = true;
-  List<String> streamLinks = [];
+  List<List<String>> streamLinks = [];
   List<String> team1Players = ["-","-","-","-","-"];
   List<String> team2Players = ["-","-","-","-","-"];
 
@@ -40,9 +40,10 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
     var logo1 = document.getElementsByClassName('match-header-link wf-link-hover mod-1')[0].getElementsByTagName('img')[0].attributes['src'];
     var logo2 = document.getElementsByClassName('match-header-link wf-link-hover mod-2')[0].getElementsByTagName('img')[0].attributes['src'];
     List<dom.Element> lst = document.getElementsByClassName("wf-card mod-dark match-streams-btn").where((element) => element.attributes.containsKey('href')).toList() + document.getElementsByClassName("match-streams-btn-external").where((element) => element.attributes.containsKey('href')).toList();
-    List<String> streams = [];
+    List<List<String>> streams = [];
     for(int i = 0; i < lst.length; i++){
-      streams.add(lst[i].attributes['href']!);
+      List<String> temp = [lst[i].text.trim(),lst[i].attributes['href']!];
+      streams.add(temp);
     }
     DateTime dt;
     try{
@@ -621,7 +622,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                   lightSource: LightSource.bottom,
                                 ),
                                 child: Text(
-                                  'Stream '+(index + 1).toString(),
+                                    streamLinks[index][0] == "" ? 'Stream '+(index + 1).toString() : streamLinks[index][0],
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       color: Colors.white
@@ -629,7 +630,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                 ),
                                 onPressed: () async{
                                   await launchUrl(
-                                    Uri.parse(streamLinks[index]),
+                                    Uri.parse(streamLinks[index][1]),
                                     mode: LaunchMode.externalApplication,
                                   );
                                 },
