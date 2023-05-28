@@ -22,13 +22,13 @@ class UpcomingSchedulePage extends StatefulWidget {
 }
 
 class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
-  Map<String, String> extraInfo = {};
+  Map<String, dynamic> extraInfo = {};
   bool isLoading = true;
   List<String> streamLinks = [];
   List<String> team1Players = ["-","-","-","-","-"];
   List<String> team2Players = ["-","-","-","-","-"];
 
-  Future<Map<String, String>> scrapeSite(url) async{
+  Future<Map<String, dynamic>> scrapeSite(url) async{
     var urlScraping = Uri.parse(url);
     var responseHTML = await http.get(urlScraping);
     var document = parser.parse(responseHTML.body);
@@ -40,9 +40,9 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
     var logo1 = document.getElementsByClassName('match-header-link wf-link-hover mod-1')[0].getElementsByTagName('img')[0].attributes['src'];
     var logo2 = document.getElementsByClassName('match-header-link wf-link-hover mod-2')[0].getElementsByTagName('img')[0].attributes['src'];
     List<dom.Element> lst = document.getElementsByClassName("wf-card mod-dark match-streams-btn").where((element) => element.attributes.containsKey('href')).toList() + document.getElementsByClassName("match-streams-btn-external").where((element) => element.attributes.containsKey('href')).toList();
-    String streams = "";
+    List<String> streams = [];
     for(int i = 0; i < lst.length; i++){
-      streams += lst[i].attributes['href']! + " ";
+      streams.add(lst[i].attributes['href']!);
     }
     DateTime dt;
     try{
@@ -55,44 +55,83 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
       }
     }
 
-    String team1Players = "";
-    String team2Players = "";
+    List<String> team1Players = [];
+    List<String> team2Players = [];
+    List<List<String>> team1Stats = [];
+    List<List<String>> team2Stats = [];
 
     try{
       List<dom.Element> elems = document.getElementsByClassName("vm-stats-game").where((element) => element.attributes['data-game-id'] == 'all').toList();
       List<dom.Element> team1 = elems[0].children[1].children[0].children[0].children[1].children;
       List<dom.Element> team2 = elems[0].children[1].children[1].children[0].children[1].children;
+
       team1.forEach((element) {
-        team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+        team1Players.add(element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim());
+        var kills = element.children[4].children[0].children[0].text.trim();
+        var deaths = element.children[5].children[0].children[1].children[0].text.trim();
+        var assists = element.children[6].children[0].children[0].text.trim();
+        var kast = element.children[8].children[0].children[0].text.trim();
+        var ADR = element.children[9].children[0].children[0].text.trim();
+        var HS = element.children[10].children[0].children[0].text.trim();
+        var ACS = element.children[3].children[0].children[0].text.trim();
+        team1Stats.add([ACS, kills, deaths, assists, kast, ADR, HS]);
       });
       team2.forEach((element) {
-        team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+        team2Players.add(element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim());
+        var kills = element.children[4].children[0].children[0].text.trim();
+        var deaths = element.children[5].children[0].children[1].children[0].text.trim();
+        var assists = element.children[6].children[0].children[0].text.trim();
+        var kast = element.children[8].children[0].children[0].text.trim();
+        var ADR = element.children[9].children[0].children[0].text.trim();
+        var HS = element.children[10].children[0].children[0].text.trim();
+        var ACS = element.children[3].children[0].children[0].text.trim();
+        team2Stats.add([ACS, kills, deaths, assists, kast, ADR, HS]);
       });
     }catch(e){
       List<dom.Element> elems = document.getElementsByClassName("vm-stats-game").where((element) => element.attributes['data-game-id'] == 'all').toList();
       List<dom.Element> team1 = elems[0].children[0].children[0].children[0].children[1].children;
       List<dom.Element> team2 = elems[0].children[0].children[1].children[0].children[1].children;
+
+
       team1.forEach((element) {
-        team1Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ",";
+        team1Players.add(element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim());
+        var kills = element.children[4].children[0].children[0].text.trim();
+        var deaths = element.children[5].children[0].children[1].children[0].text.trim();
+        var assists = element.children[6].children[0].children[0].text.trim();
+        var kast = element.children[8].children[0].children[0].text.trim();
+        var ADR = element.children[9].children[0].children[0].text.trim();
+        var HS = element.children[10].children[0].children[0].text.trim();
+        var ACS = element.children[3].children[0].children[0].text.trim();
+        team1Stats.add([ACS, kills, deaths, assists, kast, ADR, HS]);
       });
       team2.forEach((element) {
-        team2Players += element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim() + ',';
+        team2Players.add(element.children[0].children[0].children[1].children[1].text.trim() + " " + element.children[0].children[0].children[1].children[0].text.trim());
+        var kills = element.children[4].children[0].children[0].text.trim();
+        var deaths = element.children[5].children[0].children[1].children[0].text.trim();
+        var assists = element.children[6].children[0].children[0].text.trim();
+        var kast = element.children[8].children[0].children[0].text.trim();
+        var ADR = element.children[9].children[0].children[0].text.trim();
+        var HS = element.children[10].children[0].children[0].text.trim();
+        var ACS = element.children[3].children[0].children[0].text.trim();
+        team2Stats.add([ACS, kills, deaths, assists, kast, ADR, HS]);
       });
     }
     String maps = "";
     try{
-       maps = widget.m.eta == "LIVE" ? document.getElementsByClassName("match-header-note")[0].text.trim() : "-";
+      maps = document.getElementsByClassName("match-header-note")[0].text.trim();
     }catch(e){
       maps = "---";
     }
-    Map<String, String> results = {
+    Map<String, dynamic> results = {
       'DateTime' : DateTime(DateTime.now().year, dt.month, dt.day, dt.hour, dt.minute).toString(),
       'logo1' : logo1.toString(),
       'logo2' : logo2.toString(),
       'streams' : streams,
       'team_one_players' : team1Players,
       'team_two_players' : team2Players,
-      'maps': maps
+      'maps': maps,
+      'team1Stats' : team1Stats,
+      'team2Stats' : team2Stats
     };
     return results;
   }
@@ -102,11 +141,9 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
     this.scrapeSite("https://vlr.gg"+widget.m.match_url).then((value){
       setState(() {
         extraInfo = value;
-        streamLinks = extraInfo['streams']!.split(" ");
-        team1Players = extraInfo['team_one_players']!.split(",");
-        team2Players = extraInfo['team_two_players']!.split(",");
-        team1Players.removeAt(team1Players.length - 1);
-        team2Players.removeAt(team2Players.length - 1);
+        streamLinks = extraInfo['streams']!;
+        team1Players = extraInfo['team_one_players']!;
+        team2Players = extraInfo['team_two_players']!;
         isLoading = false;
       });
     });
@@ -132,133 +169,30 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
       ),
       body: isLoading ? Loading() : Column(
         children: [
-          Container(
-            color: shared.Theme.swatch1,
-            padding: EdgeInsets.fromLTRB(0,10,0,0),
-            child: ListTile(
-              isThreeLine: true,
-              title: Column(
-                children: [
-                  Text(
-                    this.widget.m.event_name,
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 10
+          Expanded(
+            flex: 3,
+            child: Container(
+              color: shared.Theme.swatch1,
+              padding: EdgeInsets.fromLTRB(0,10,0,0),
+              child: ListTile(
+                isThreeLine: false,
+                title: Column(
+                  children: [
+                    Text(
+                      this.widget.m.event_name,
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 10
+                      ),
                     ),
-                  ),
-                  FutureBuilder(
-                    future: Teams().getTeam(this.widget.m.team_one_name, this.widget.m.team_two_name),
-                    builder: (context, t){
-                      List<Team>? snapshot = t.data;
-                      return Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              margin: EdgeInsets.all(10),
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  color: shared.Theme.swatch2,
-                                  borderRadius: BorderRadius.all(Radius.circular(10))
-                              ),
-                              child:
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 7),
-                                  child: extraInfo['logo1'] == "/img/vlr/tmp/vlr.png" ?
-                                  Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
-                                      :
-                                  Image.network("https:"+extraInfo['logo1']!, height: 40, width: 40,)
-                                  ),
-                                  this.widget.m.team_one_name.split(" ").length == 1 ? Text(
-                                    this.widget.m.team_one_name,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        letterSpacing: 1,
-                                        fontFamily: "Font4"
-                                    ),
-                                  ) : SizedBox(
-                                    height: 20,
-                                    width: 70,
-                                    child: Marquee(
-                                      text: this.widget.m.team_one_name,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          letterSpacing: 1,
-                                          fontFamily: "Font4"
-                                      ),
-                                      scrollAxis: Axis.horizontal,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      blankSpace: 10.0,
-                                      velocity: 40.0,
-                                      accelerationDuration: Duration(seconds: 1),
-                                      accelerationCurve: Curves.linear,
-                                      decelerationDuration: Duration(milliseconds: 500),
-                                      decelerationCurve: Curves.easeOut,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                      height: 13,
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Image.network(
-                                            Flag().getLink(this.widget.m.flag1),
-                                            width: 12,
-                                          ),
-                                          Text(
-                                            " " + Flag().getName(this.widget.m.flag1),
-                                            style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 8.5
-                                            ),
-                                          )
-                                        ],
-                                      )
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                              flex: 1,
-                              child: Container(
-                                // color: Colors.red,
-                                  child: CircleAvatar(
-                                    child: Stack(
-                                      children: [
-                                        Opacity(
-                                          opacity: 0.2,
-                                          child: Image.network(
-                                            this.widget.m.event_icon_url,
-                                            height: 40,
-                                          ),
-                                        ),
-                                        Text(
-                                          'V/S',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.w500,
-                                            fontFamily: 'Font3',
-                                          ),
-                                        )
-                                      ],
-                                      alignment: Alignment.center,
-                                    ),
-                                    backgroundColor: shared.Theme.swatch1Light,
-                                  )
-                              )
-                          ),
-                          Expanded(
+                    FutureBuilder(
+                      future: Teams().getTeam(this.widget.m.team_one_name, this.widget.m.team_two_name),
+                      builder: (context, t){
+                        List<Team>? snapshot = t.data;
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
                               flex: 1,
                               child: Container(
                                 margin: EdgeInsets.all(10),
@@ -267,19 +201,20 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                     color: shared.Theme.swatch2,
                                     borderRadius: BorderRadius.all(Radius.circular(10))
                                 ),
-                                child: Column(
+                                child:
+                                Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Padding(
-                                      padding: EdgeInsets.only(bottom: 7),
-                                      child: extraInfo['logo2'] == "/img/vlr/tmp/vlr.png" ?
-                                      Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
-                                          :
-                                      Image.network("https:"+extraInfo['logo2']!, height: 40, width: 40,)
+                                        padding: EdgeInsets.only(bottom: 7),
+                                        child: extraInfo['logo1'] == "/img/vlr/tmp/vlr.png" ?
+                                        Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
+                                            :
+                                        Image.network("https:"+extraInfo['logo1']!, height: 40, width: 40,)
                                     ),
-                                    this.widget.m.team_two_name.split(" ").length == 1 ? Text(
-                                      this.widget.m.team_two_name,
+                                    this.widget.m.team_one_name.split(" ").length == 1 ? Text(
+                                      this.widget.m.team_one_name,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Colors.white,
@@ -291,7 +226,7 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                       height: 20,
                                       width: 70,
                                       child: Marquee(
-                                        text: this.widget.m.team_two_name,
+                                        text: this.widget.m.team_one_name,
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 16,
@@ -314,11 +249,11 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Image.network(
-                                              Flag().getLink(this.widget.m.flag2),
+                                              Flag().getLink(this.widget.m.flag1),
                                               width: 12,
                                             ),
                                             Text(
-                                              " " + Flag().getName(this.widget.m.flag2),
+                                              " " + Flag().getName(this.widget.m.flag1),
                                               style: TextStyle(
                                                   color: Colors.grey,
                                                   fontSize: 8.5
@@ -329,269 +264,383 @@ class _UpcomingSchedulePageState extends State<UpcomingSchedulePage> {
                                     )
                                   ],
                                 ),
-                              )
-                          )
-                        ],
-                      );
-                    },
-                  ),
-                ],
-              ),
-              subtitle: Column(
-                children: [
-                  this.widget.m.eta == "LIVE" ?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          this.widget.m.score1,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 13
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: NeumorphicButton(
-                          child: Text(
-                            'LIVE',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                letterSpacing: 3,
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal,
-                                fontFamily: "Font2"
+                              ),
                             ),
-                          ),
-                          style: NeumorphicStyle(
-                              shape: NeumorphicShape.convex,
-                              boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(9)),
-                              depth: 4,
-                              lightSource: LightSource.top,
-                              color: shared.Theme.swatch2
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Text(
-                          this.widget.m.score2,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 13
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                      :
-                  Text(
-                    DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(extraInfo['DateTime']!)).toString() + "\n" + this.widget.m.eta,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 13
-                    ),
-                  ),
-                ],
-              ),
-
-              onTap: () async{
-
-              },
-            ),
-          ),
-
-          Divider(
-            thickness: 1,
-            indent: 20,
-            endIndent: 20,
-            color: Colors.grey,
-          ),
-
-          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Container(
-              padding: EdgeInsets.fromLTRB(23,0,23,0),
-              child: Text(
-                "Maps",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    height: 2,
-                    fontWeight: FontWeight.bold
-                ),
-              )
-          ) : SizedBox(height: 0,),
-
-          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Container(
-            padding: EdgeInsets.fromLTRB(23,0,23,11),
-            child: Text(
-              extraInfo['maps']!,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 11,
-                  height: 2
-              ),
-            )
-          ) : SizedBox(height: 0,),
-
-
-          widget.m.eta == "LIVE" && extraInfo['maps'] != "---" ? Divider(
-            thickness: 1,
-            indent: 20,
-            endIndent: 20,
-            color: Colors.grey,
-          ) : SizedBox(height: 0,),
-
-
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: MediaQuery.of(context).size.height * 0.22,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          widget.m.team_one_name,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                          child: ListView.builder(
-                              itemCount: team1Players.length,
-                              itemBuilder: (context, index){
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    team1Players[index],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.grey[400],
-                                        fontSize: 12
-                                    ),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  // color: Colors.red,
+                                    child: CircleAvatar(
+                                      child: Stack(
+                                        children: [
+                                          Opacity(
+                                            opacity: 0.2,
+                                            child: Image.network(
+                                              this.widget.m.event_icon_url,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Text(
+                                            'V/S',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: 'Font3',
+                                            ),
+                                          )
+                                        ],
+                                        alignment: Alignment.center,
+                                      ),
+                                      backgroundColor: shared.Theme.swatch1Light,
+                                    )
+                                )
+                            ),
+                            Expanded(
+                                flex: 1,
+                                child: Container(
+                                  margin: EdgeInsets.all(10),
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                      color: shared.Theme.swatch2,
+                                      borderRadius: BorderRadius.all(Radius.circular(10))
                                   ),
-                                );
-                              }
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                VerticalDivider(
-                  width: 20,
-                  thickness: 1,
-                  indent: 20,
-                  endIndent: 20,
-                  color: Colors.grey,
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  height: MediaQuery.of(context).size.height * 0.22,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          widget.m.team_two_name,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                          child: ListView.builder(
-                              itemCount: team2Players.length,
-                              itemBuilder: (context, index){
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    team2Players[index],
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.grey[400],
-                                        fontSize: 12
-                                    ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                          padding: EdgeInsets.only(bottom: 7),
+                                          child: extraInfo['logo2'] == "/img/vlr/tmp/vlr.png" ?
+                                          Image.network("https://www.precisionpass.co.uk/wp-content/uploads/2018/03/default-team-logo.png", height: 40,width: 40)
+                                              :
+                                          Image.network("https:"+extraInfo['logo2']!, height: 40, width: 40,)
+                                      ),
+                                      this.widget.m.team_two_name.split(" ").length == 1 ? Text(
+                                        this.widget.m.team_two_name,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            letterSpacing: 1,
+                                            fontFamily: "Font4"
+                                        ),
+                                      ) : SizedBox(
+                                        height: 20,
+                                        width: 70,
+                                        child: Marquee(
+                                          text: this.widget.m.team_two_name,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              letterSpacing: 1,
+                                              fontFamily: "Font4"
+                                          ),
+                                          scrollAxis: Axis.horizontal,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          blankSpace: 10.0,
+                                          velocity: 40.0,
+                                          accelerationDuration: Duration(seconds: 1),
+                                          accelerationCurve: Curves.linear,
+                                          decelerationDuration: Duration(milliseconds: 500),
+                                          decelerationCurve: Curves.easeOut,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          height: 13,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Image.network(
+                                                Flag().getLink(this.widget.m.flag2),
+                                                width: 12,
+                                              ),
+                                              Text(
+                                                " " + Flag().getName(this.widget.m.flag2),
+                                                style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 8.5
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                      )
+                                    ],
                                   ),
-                                );
-                              }
-                          )
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-
-          Divider(
-            thickness: 1,
-            indent: 20,
-            endIndent: 20,
-            color: Colors.grey,
-          ),
-
-          Container(
-              padding: EdgeInsets.fromLTRB(23,0,23,3),
-              child: Text(
-                "Stream Links",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    height: 2,
-                    fontWeight: FontWeight.bold
-                ),
-              )
-          ),
-
-          Expanded(
-            child: ListView.builder(
-                itemCount: streamLinks.length,
-                itemBuilder: (context, index){
-                  return streamLinks[index] == "" ? SizedBox(height: 0,) : Container(
-                    padding: EdgeInsets.fromLTRB(20, 5, 20, 0),
-                    child: NeumorphicButton(
-                      style: NeumorphicStyle(
-                        color: shared.Theme.swatch1Lighter,
-                        depth: 15,
-                        intensity: 0.5,
-                        shadowLightColor: shared.Theme.swatch1Light,
-                        shadowDarkColor: shared.Theme.swatch1Light,
-                        shape: NeumorphicShape.flat,
-                        lightSource: LightSource.bottom,
-                      ),
-                      child: Text(
-                        'Stream '+(index + 1).toString(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.white
-                        ),
-                      ),
-                      onPressed: () async{
-                        await launchUrl(
-                          Uri.parse(streamLinks[index]),
-                          mode: LaunchMode.externalApplication,
+                                )
+                            )
+                          ],
                         );
                       },
                     ),
-                  );
-                }
+                    this.widget.m.eta == "LIVE" ?
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            this.widget.m.score1,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: 13
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: NeumorphicButton(
+                            child: Text(
+                              'LIVE',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  letterSpacing: 3,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                  fontFamily: "Font2"
+                              ),
+                            ),
+                            style: NeumorphicStyle(
+                                shape: NeumorphicShape.convex,
+                                boxShape: NeumorphicBoxShape.roundRect(BorderRadius.circular(9)),
+                                depth: 4,
+                                lightSource: LightSource.top,
+                                color: shared.Theme.swatch2
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Text(
+                            this.widget.m.score2,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white60,
+                                fontSize: 13
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                        :
+                    Text(
+                      DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(extraInfo['DateTime']!)).toString() + "\n" + this.widget.m.eta,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: 13
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      child: Text(
+                        extraInfo['maps']! == '---' ? "Maps: Maps not decided yet" : "Maps: " + extraInfo['maps']!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 11,
+                            fontStyle: extraInfo['maps']! == '---' ? FontStyle.italic : FontStyle.normal,
+                            height: 2
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                onTap: () async{
+
+                },
+              ),
+            ),
+          ),
+
+          Expanded(
+            flex: 4,
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade800),
+                  borderRadius: BorderRadius.circular(10),
+                  color: shared.Theme.swatch1Lighter
+              ),
+              margin: EdgeInsets.fromLTRB(20, 0, 20, 25),
+              padding: EdgeInsets.fromLTRB(10, 15, 10, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 4, child: Text(widget.m.team_one_name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("ACS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("K", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("D", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("A", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("ADR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("HS%", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height * 0.11,
+                      child: ListView.builder(
+                          itemCount: team1Players.length,
+                          itemBuilder: (context, index){
+                            return Row(
+                              children: [
+                                Expanded(flex: 4, child: Text(team1Players[index], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][0] == "" ? '-' : extraInfo['team1Stats'][index][0], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][1] == "" ? '-' : extraInfo['team1Stats'][index][1], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][2] == "" ? '-' : extraInfo['team1Stats'][index][2], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][3] == "" ? '-' : extraInfo['team1Stats'][index][3], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][5] == "" ? '-' : extraInfo['team1Stats'][index][5], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team1Stats'][index][6] == "" ? '-' : extraInfo['team1Stats'][index][6], style: TextStyle(color: Colors.white),)),
+                              ],
+                            );
+                          }
+                      )
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 4, child: Text(widget.m.team_two_name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("ACS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("K", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("D", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("A", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("ADR", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                        Expanded(child: Text("HS%", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                      ],
+                    ),
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey,
+                  ),
+                  Container(
+                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
+                      height: MediaQuery
+                          .of(context)
+                          .size
+                          .height * 0.11,
+                      child: ListView.builder(
+                          itemCount: team2Players.length,
+                          itemBuilder: (context, index){
+                            return Row(
+                              children: [
+                                Expanded(flex: 4, child: Text(team2Players[index], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][0] == "" ? "-" : extraInfo['team2Stats'][index][0], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][1] == "" ? "-" : extraInfo['team2Stats'][index][1], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][2] == "" ? "-" : extraInfo['team2Stats'][index][2], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][3] == "" ? "-" : extraInfo['team2Stats'][index][3], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][5] == "" ? "-" : extraInfo['team2Stats'][index][5], style: TextStyle(color: Colors.white),)),
+                                Expanded(child: Text(extraInfo['team2Stats'][index][6] == "" ? "-" : extraInfo['team2Stats'][index][6], style: TextStyle(color: Colors.white),)),
+                              ],
+                            );
+                          }
+                      )
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Expanded(
+            flex: 3,
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.shade800),
+                  borderRadius: BorderRadius.circular(10),
+                  color: shared.Theme.swatch1Light
+              ),
+              margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 1,
+                      child: Container(
+                        padding: EdgeInsets.only(top: 7),
+                        child: Text(
+                          "Streams",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15
+                          ),
+                        ),
+                      )
+                  ),
+                  Expanded(
+                    flex: 5,
+                    child: Container(
+                      padding: EdgeInsets.only(bottom: 7),
+                      child: ListView.builder(
+                          itemCount: streamLinks.length,
+                          itemBuilder: (context, index){
+                            return streamLinks[index] == "" ? SizedBox(height: 0,) : Container(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 0),
+                              child: NeumorphicButton(
+                                style: NeumorphicStyle(
+                                  color: shared.Theme.swatch1Lighter,
+                                  depth: 15,
+                                  intensity: 0.5,
+                                  shadowLightColor: shared.Theme.swatch1Light,
+                                  shadowDarkColor: shared.Theme.swatch1Light,
+                                  shape: NeumorphicShape.flat,
+                                  lightSource: LightSource.bottom,
+                                ),
+                                child: Text(
+                                  'Stream '+(index + 1).toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white
+                                  ),
+                                ),
+                                onPressed: () async{
+                                  await launchUrl(
+                                    Uri.parse(streamLinks[index]),
+                                    mode: LaunchMode.externalApplication,
+                                  );
+                                },
+                              ),
+                            );
+                          }
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],

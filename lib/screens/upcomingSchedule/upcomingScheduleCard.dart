@@ -109,7 +109,7 @@ class UpcomingScheduleCard extends StatelessWidget {
                                                 " " + Flag().getName(this.match.flag1),
                                                 style: TextStyle(
                                                     color: Colors.grey,
-                                                    fontSize: 8.5
+                                                    fontSize: 7
                                                 ),
                                               )
                                             ],
@@ -213,7 +213,7 @@ class UpcomingScheduleCard extends StatelessWidget {
                                                 " " + Flag().getName(this.match.flag2),
                                                 style: TextStyle(
                                                   color: Colors.grey,
-                                                  fontSize: 8.5
+                                                  fontSize: 7
                                                 ),
                                               )
                                             ],

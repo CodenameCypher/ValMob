@@ -107,7 +107,7 @@ class PreviousMatchesCard extends StatelessWidget {
                                           " " + Flag().getName(this.match.flag1),
                                           style: TextStyle(
                                               color: Colors.grey,
-                                              fontSize: 8.5
+                                              fontSize: 8
                                           ),
                                         )
                                       ],
@@ -211,7 +211,7 @@ class PreviousMatchesCard extends StatelessWidget {
                                             " " + Flag().getName(this.match.flag2),
                                             style: TextStyle(
                                                 color: Colors.grey,
-                                                fontSize: 8.5
+                                                fontSize: 8
                                             ),
                                           )
                                         ],

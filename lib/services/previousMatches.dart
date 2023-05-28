@@ -72,19 +72,29 @@ class PreviousMatches{
   DateTime calculateDateTime(String eta){
     DateTime dateTime = DateTime.now();
     List<String> strings = eta.split(" ");
-    for(var i = 0; i < strings.length - 1 ; i++){
-      String current = strings[i];
-      if(current[current.length-1] == 'd'){
-        dateTime = dateTime.subtract(Duration(days: int.parse(current.substring(0,current.length-1))));
-      }
-      else if(current[current.length-1] == 'h'){
-        dateTime = dateTime.subtract(Duration(hours: int.parse(current.substring(0,current.length-1))));
-      }else{
-        dateTime = dateTime.subtract(Duration(minutes: int.parse(current.substring(0,current.length-1))));
-      }
-    }
+    strings.removeAt(strings.length - 1);
+    dateTime = dateTime.subtract(calculateFromEta(strings));
     dateTime = DateTime.fromMillisecondsSinceEpoch(dateTime.millisecondsSinceEpoch - (dateTime.millisecondsSinceEpoch % Duration(minutes: 5).inMilliseconds));
     return alignDateTime(dateTime, Duration(hours: 1), true);
+  }
+
+  Duration calculateFromEta(List<String> times){
+    Duration dt = Duration(days: 0);
+    times.forEach((element) {
+      if(element.endsWith('w')){
+        dt = Duration(milliseconds: (dt.inMilliseconds + Duration(days: int.parse(element.substring(0, element.length - 1)) * 7).inMilliseconds));
+      }
+      else if(element.endsWith('d')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(days: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+      else if(element.endsWith('h')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(hours: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+      else if(element.endsWith('m')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(minutes: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+    });
+    return dt;
   }
 
   DateTime alignDateTime(DateTime dt, Duration alignment,[bool roundUp = false]) {

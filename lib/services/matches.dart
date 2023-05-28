@@ -30,7 +30,12 @@ class Matches{
                 match_url: json2['data']['segments'][i]['match_page'],
                 event_name: json2['data']['segments'][i]['tournament_name'],
                 event_icon_url: json2['data']['segments'][i]['tournament_icon'],
-                match_time: json2['data']['segments'][i]['time_until_match'] == "Upcoming" ? DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1).toString() : calculateDateTime(json2['data']['segments'][i]['time_until_match']).toString(),
+                match_time: json2['data']['segments'][i]['time_until_match'] == "Upcoming" ?
+                            DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1).toString()
+                                :
+                            json2['data']['segments'][i]['time_until_match'] == "LIVE" ? DateTime.now().toString()
+                                :
+                            calculateDateTime(json2['data']['segments'][i]['time_until_match']).toString(),
                 eta: json2['data']['segments'][i]['time_until_match'],
                 flag1: json2['data']['segments'][i]['flag1'],
                 flag2: json2['data']['segments'][i]['flag2'],
@@ -71,20 +76,31 @@ class Matches{
 
   DateTime calculateDateTime(String eta){
     DateTime dateTime = DateTime.now();
-    List<String> strings = eta.split(" ");
-    for(var i = 0; i < strings.length - 2 ; i++){
-      String current = strings[i];
-      if(current[current.length-1] == 'd'){
-        dateTime = dateTime.add(Duration(days: int.parse(current.substring(0,current.length-1))));
-      }
-      else if(current[current.length-1] == 'h'){
-        dateTime = dateTime.add(Duration(hours: int.parse(current.substring(0,current.length-1))));
-      }else{
-        dateTime = dateTime.add(Duration(minutes: int.parse(current.substring(0,current.length-1))));
-      }
-    }
+    List<String> strings = eta.split(' ');
+    strings.removeAt(strings.length - 1);
+    strings.removeAt(strings.length - 1);
+    dateTime = dateTime.add(calculateFromEta(strings));
     dateTime = DateTime.fromMillisecondsSinceEpoch(dateTime.millisecondsSinceEpoch - (dateTime.millisecondsSinceEpoch % Duration(minutes: 5).inMilliseconds));
     return alignDateTime(dateTime, Duration(hours: 1), true);
+  }
+
+  Duration calculateFromEta(List<String> times){
+    Duration dt = Duration(days: 0);
+    times.forEach((element) {
+      if(element.endsWith('w')){
+        dt = Duration(milliseconds: (dt.inMilliseconds + Duration(days: int.parse(element.substring(0, element.length - 1)) * 7).inMilliseconds));
+      }
+      else if(element.endsWith('d')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(days: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+      else if(element.endsWith('h')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(hours: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+      else if(element.endsWith('m')){
+        dt = Duration(milliseconds: dt.inMilliseconds + Duration(minutes: int.parse(element.substring(0, element.length - 1))).inMilliseconds);
+      }
+    });
+    return dt;
   }
 
   DateTime alignDateTime(DateTime dt, Duration alignment,[bool roundUp = false]) {
