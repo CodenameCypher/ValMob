@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marquee/marquee.dart';
 import 'package:valmob/models/matches.dart' as model;
-import 'package:valmob/screens/upcomingSchedule/upcomingSchedulePage.dart';
 import 'package:valmob/shared/theme.dart' as shared;
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:valmob/services/teams.dart';
 import 'package:valmob/models/team.dart';
 import 'package:valmob/services/flags.dart';
+
+import 'package:valmob/shared/matchPage.dart';
 
 class UpcomingScheduleCard extends StatelessWidget {
   final model.Match match;
@@ -294,7 +294,7 @@ class UpcomingScheduleCard extends StatelessWidget {
             ),
 
             onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => UpcomingSchedulePage(m: this.match)));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => MatchPage(m: this.match)));
             },
           ),
         )

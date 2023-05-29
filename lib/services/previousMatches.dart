@@ -5,13 +5,14 @@ import 'package:valmob/models/matches.dart' as model;
 import 'package:intl/intl.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
+import 'api.dart';
 
 class PreviousMatches{
   final CollectionReference ref = FirebaseFirestore.instance.collection('PreviousMatches');
   Future<List<model.Match>> fetchAPI() async{
     print("Fetching Previous Matches API...");
     List<model.Match> matchList = [];
-    var url = Uri.parse("https://vlrggapi.vercel.app/match/results");
+    var url = API().previousMatchesAPI;
     var headers = {
       "cache-control": "no-cache",
       "pragma":'no_cache',

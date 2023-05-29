@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:valmob/models/news.dart' as model;
+import 'api.dart';
 
 class News{
   CollectionReference ref = FirebaseFirestore.instance.collection("News");
   Future<List<model.News>> fetchAPI() async{
     List<model.News> newsList = [];
     print("Fetching News API...");
-    var url = Uri.parse("https://vlrggapi.vercel.app/news");
+    var url = API().newsAPI;
     var response = await http.get(url);
     var json = jsonDecode(Utf8Decoder().convert(response.bodyBytes))['data']['segments'];
     for(var i = 0; i < json.length; i++){

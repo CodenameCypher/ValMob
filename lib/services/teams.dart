@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valmob/models/team.dart';
+import 'api.dart';
 
 class Teams{
   final CollectionReference ref = FirebaseFirestore.instance.collection("Teams");
@@ -10,7 +11,7 @@ class Teams{
     List<String> regions = ['na', 'eu', 'ap', 'la', 'oce', 'kr', 'mn','gc','br','cn','la-s','la-n'];
     print("Fetching Teams API...");
     for(var i = 0; i < regions.length; i++){
-      var url = Uri.parse('https://vlrggapi.vercel.app/rankings/'+regions[i]);
+      var url = Uri.parse(API().teamsAPI + regions[i]);
       var response = await http.get(url);
       var json = jsonDecode(Utf8Decoder().convert(response.bodyBytes));
       for(var j = 0; j < json['data'].length; j++){

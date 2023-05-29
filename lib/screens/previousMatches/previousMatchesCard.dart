@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:marquee/marquee.dart';
 import 'package:valmob/models/matches.dart' as model;
-import 'package:valmob/screens/previousMatches/previousMatchesPage.dart';
+import 'package:valmob/shared/matchPage.dart';
 import 'package:valmob/shared/theme.dart' as shared;
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:valmob/services/teams.dart';
@@ -271,7 +271,7 @@ class PreviousMatchesCard extends StatelessWidget {
             ),
 
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => PreviousMatchesPage(m: this.match)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MatchPage(m: this.match)));
             },
           ),
         )

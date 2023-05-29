@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:valmob/models/player.dart';
+import 'api.dart';
 
 class Players{
   final CollectionReference ref = FirebaseFirestore.instance.collection("Players");
   Future<List<Player>> fetchAPI() async{
     print("Fetching Players API...");
-    final url = Uri.parse("https://vlrgg.cyclic.app/api/players");
+    final url = API().playersAPI;
     var response = await http.get(url);
     var json = jsonDecode(Utf8Decoder().convert(response.bodyBytes));
     List<Player> playerList = [];
