@@ -33,8 +33,8 @@ ValMob is an Android application created using Flutter and designed to provide u
 
 ## Flutter and Dart Versions
 
-- Flutter: 3.7.8
-- Dart: 2.19.5
+- Flutter: 3.10.2
+- Dart: 3.0.2
 
 ## Contact
 
