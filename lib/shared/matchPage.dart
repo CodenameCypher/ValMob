@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/cli_commands.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:intl/intl.dart';
 import 'package:marquee/marquee.dart';
@@ -23,7 +24,7 @@ class _MatchPageState extends State<MatchPage> {
   List<List<String>> streamLinks = [];
   List<String> team1Players = ["-","-","-","-","-"];
   List<String> team2Players = ["-","-","-","-","-"];
-
+  List<List<String>> maps = [];
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class _MatchPageState extends State<MatchPage> {
         streamLinks = widget.m.eta.split(" ").last == 'ago' ? extraInfo['vods']! : extraInfo['streams']!;
         team1Players = extraInfo['team_one_players']!;
         team2Players = extraInfo['team_two_players']!;
+        maps = extraInfo['maps'];
         isLoading = false;
       });
     });
@@ -307,7 +309,7 @@ class _MatchPageState extends State<MatchPage> {
                             ),
                           ),
                         )
-                        :
+                            :
                         Text(
                           DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(extraInfo['DateTime']!)).toString() + "\n" + this.widget.m.eta,
                           textAlign: TextAlign.center,
@@ -333,6 +335,463 @@ class _MatchPageState extends State<MatchPage> {
                 ],
               ),
             ),
+            this.maps.isNotEmpty?
+            Container(
+              height: MediaQuery.of(context).size.height * 0.10,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(width: 1.0, color: Colors.grey),
+                  bottom: BorderSide(width: 1.0, color: Colors.grey),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][0][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][0][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][0][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height:0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][0][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][0][2][0].toUpperCase()+extraInfo['maps'][0][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][1][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][1][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][1][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height:0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][1][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][1][2][0].toUpperCase()+extraInfo['maps'][1][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][2][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][2][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][2][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height: 0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][2][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][2][2][0].toUpperCase()+extraInfo['maps'][2][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][3][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][3][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][3][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height:0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][3][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][3][2][0].toUpperCase()+extraInfo['maps'][3][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][4][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][4][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][4][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height:0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][4][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][4][2][0].toUpperCase()+extraInfo['maps'][4][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][5][2] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: extraInfo['maps'][5][1] == 'ban' ? AlwaysStoppedAnimation(.5) : AlwaysStoppedAnimation(1),
+                          ),
+                          extraInfo['maps'][5][1] == 'ban' ?
+                          Icon(
+                            Icons.close,
+                            size: MediaQuery.of(context).size.width * 0.13,
+                            color: Colors.red.shade800,
+                          )
+                              :
+                          SizedBox(height:0),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][5][0].toUpperCase(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][5][2][0].toUpperCase()+extraInfo['maps'][5][2].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.13,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          right: BorderSide(width: 1.0, color: Colors.grey),
+                          left: BorderSide(width: 1.0, color: Colors.grey),
+                        ),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset('assets/maps/' + extraInfo['maps'][6][0] + '.jpg',
+                            width: MediaQuery.of(context).size.width * 0.13,
+                            fit: BoxFit.cover,
+                            opacity: AlwaysStoppedAnimation(1),
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.bottomCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  "Decider",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          ),
+                          Container(
+                              color: Colors.transparent,
+                              height: double.infinity,
+                              alignment: Alignment.topCenter,
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                                width: double.infinity,
+                                padding: EdgeInsets.all(2),
+                                child: Text(
+                                  extraInfo['maps'][6][0][0].toUpperCase()+extraInfo['maps'][6][0].substring(1),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+                ],
+              ),
+            )
+                :
             Container(
                 height: MediaQuery.of(context).size.height * 0.10,
                 width: MediaQuery.of(context).size.width,
@@ -342,30 +801,30 @@ class _MatchPageState extends State<MatchPage> {
                     bottom: BorderSide(width: 1.0, color: Colors.grey),
                   ),
                 ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Maps",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Maps",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    extraInfo['maps']! == '---' ? "Maps not decided yet" : extraInfo['maps']!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 11,
-                        fontStyle: extraInfo['maps']! == '---' ? FontStyle.italic : FontStyle.normal,
-                        height: 2
+                    Text(
+                      "Maps not decided yet",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11,
+                          fontStyle: extraInfo['maps']! == '---' ? FontStyle.italic : FontStyle.normal,
+                          height: 2
+                      ),
                     ),
-                  ),
-                ],
-              )
+                  ],
+                )
             ),
             Container(
               height: MediaQuery.of(context).size.height * 0.55,
@@ -378,7 +837,7 @@ class _MatchPageState extends State<MatchPage> {
                         height: MediaQuery.of(context).size.height * 0.07,
                         padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                         decoration: BoxDecoration(
-                          color: shared.Theme.swatch1Lighter
+                            color: shared.Theme.swatch1Lighter
                         ),
                         child: TabBar(
                           indicatorColor: Colors.amberAccent,
@@ -386,22 +845,22 @@ class _MatchPageState extends State<MatchPage> {
                             Tooltip(
                               message: widget.m.team_one_name + "'s statistics",
                               child: Tab(
-                                icon: new Image.network("https:"+extraInfo['logo1']!, height: 24, width: 24,),
+                                icon: Image.network(extraInfo['logo1']! == '/img/vlr/tmp/vlr.png' ? "https://vlr.gg"+extraInfo['logo1']! :"https:"+extraInfo['logo1']!, height: 24, width: 24,),
                                 text: extraInfo['team_one_shortForm'],
                               ),
                             ),
                             Tooltip(
                               message: widget.m.team_two_name + "'s statistics",
                               child: Tab(
-                                icon: new Image.network("https:"+extraInfo['logo2']!, height: 24, width: 24,),
+                                icon: Image.network(extraInfo['logo2']! == '/img/vlr/tmp/vlr.png' ? "https://vlr.gg"+extraInfo['logo2']! : "https:"+extraInfo['logo2']!, height: 24, width: 24,),
                                 text: extraInfo['team_two_shortForm'],
                               ),
                             ),
                             Tooltip(
                               message: widget.m.eta.split(" ").last == 'ago' ? "Replays" : "Streams",
                               child: Tab(
-                                  icon: Icon(Icons.live_tv_outlined, size: 24,),
-                                  text: widget.m.eta.split(" ").last == 'ago' ? "Replays" : "Streams",
+                                icon: Icon(Icons.live_tv_outlined, size: 24,),
+                                text: widget.m.eta.split(" ").last == 'ago' ? "Replays" : "Streams",
                               ),
                             )
                           ],
@@ -418,7 +877,7 @@ class _MatchPageState extends State<MatchPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      Expanded(flex: 4, child: Text(widget.m.team_one_name, textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                                      Expanded(flex: 4, child: Text(extraInfo['team_one_shortForm'], textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 2, child: Text("ACS", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 1, child: Text("K", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 1, child: Text("D", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),
@@ -433,11 +892,11 @@ class _MatchPageState extends State<MatchPage> {
                                         return Row(
                                           children: [
                                             Expanded(flex: 4, child: Text(team1Players[index], textAlign: TextAlign.start, style: TextStyle(color: Colors.white),)),
-                                            Expanded(flex: 2, child: Text(extraInfo['team1Stats'][index][0] == "" ? "-" : extraInfo['team2Stats'][index][0], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
-                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][1] == "" ? "-" : extraInfo['team2Stats'][index][1], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
-                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][2] == "" ? "-" : extraInfo['team2Stats'][index][2], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
-                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][3] == "" ? "-" : extraInfo['team2Stats'][index][3], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
-                                            Expanded(flex: 2, child: Text(extraInfo['team1Stats'][index][6] == "" ? "-" : extraInfo['team2Stats'][index][6], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
+                                            Expanded(flex: 2, child: Text(extraInfo['team1Stats'][index][0] == "" ? "-" : extraInfo['team1Stats'][index][0], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
+                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][1] == "" ? "-" : extraInfo['team1Stats'][index][1], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
+                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][2] == "" ? "-" : extraInfo['team1Stats'][index][2], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
+                                            Expanded(flex: 1, child: Text(extraInfo['team1Stats'][index][3] == "" ? "-" : extraInfo['team1Stats'][index][3], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
+                                            Expanded(flex: 2, child: Text(extraInfo['team1Stats'][index][6] == "" ? "-" : extraInfo['team1Stats'][index][6], textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2),)),
                                           ],
                                         );
                                       },
@@ -453,7 +912,7 @@ class _MatchPageState extends State<MatchPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      Expanded(flex: 4, child: Text(widget.m.team_two_name, textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
+                                      Expanded(flex: 4, child: Text(extraInfo['team_two_shortForm'], textAlign: TextAlign.start, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 2, child: Text("ACS", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 1, child: Text("K", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),
                                       Expanded(flex: 1, child: Text("D", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, height: 2, fontWeight: FontWeight.bold),)),

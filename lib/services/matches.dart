@@ -31,7 +31,10 @@ class Matches{
                 match_url: json2['data']['segments'][i]['match_page'],
                 event_name: json2['data']['segments'][i]['tournament_name'],
                 event_icon_url: json2['data']['segments'][i]['tournament_icon'],
-                match_time: json2['data']['segments'][i]['time_until_match'] == "Upcoming" ?
+                match_time: json2['data']['segments'][i]['time_until_match'] == "TBD" ?
+                            DateTime(DateTime.now().year + 1, DateTime.now().month, DateTime.now().day, DateTime.now().hour).toString()
+                                :
+                            json2['data']['segments'][i]['time_until_match'] == "Upcoming" ?
                             DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour+1).toString()
                                 :
                             json2['data']['segments'][i]['time_until_match'] == "LIVE" ? DateTime.now().toString()
@@ -144,7 +147,7 @@ class Matches{
           match_url: e.get('match_url'),
           event_name: e.get('event_name'),
           event_icon_url: e.get('event_icon_url'),
-          match_time: e.get('match_time').toDate().toString(),
+          match_time: e.get('eta') == "TBD" ? "TBD" : e.get('match_time').toDate().toString(),
           eta: e.get('eta'),
           flag1: e.get('flag1'),
           flag2: e.get('flag2'),

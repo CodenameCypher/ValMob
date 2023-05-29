@@ -283,7 +283,7 @@ class UpcomingScheduleCard extends StatelessWidget {
                 )
                     :
                 Text(
-                  DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(this.match.match_time)).toString() + "\n" + this.match.eta,
+                  this.match.eta == 'TBD' ? "TBD" : DateFormat("EEE, MMM d, h:mm a").format(DateTime.parse(this.match.match_time)).toString() + "\n" + this.match.eta,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Colors.white60,
